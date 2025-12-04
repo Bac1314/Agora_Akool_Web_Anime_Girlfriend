@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AI Assistant - Agora ConvoAI Demo</title>
+    <title>バーチャル彼女 - Virtual Girlfriend</title>
     <link rel="stylesheet" href="styles/main.css">
     <script src="/lib/agora-rtc-sdk-ng/AgoraRTC_N-production.js"></script>
 </head>
@@ -12,9 +12,13 @@
         <!-- Full-Screen Avatar Background -->
         <div class="avatar-fullscreen" id="avatarContainer">
             <div class="avatar-placeholder" id="avatarPlaceholder">
-                <div class="avatar-icon">👤</div>
-                <p>Avatar Loading...</p>
-                <div class="pulse-animation"></div>
+                <div class="avatar-icon">👩‍💻</div>
+                <p>彼女を呼んでいます...</p>
+                <div class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </div>
             <div class="avatar-video" id="avatarVideo" style="display: none;"></div>
         </div>
@@ -22,12 +26,15 @@
         <!-- Top Status Bar -->
         <div class="status-overlay">
             <div class="status-left">
-                <div class="app-title">AI Assistant</div>
+<div class="app-title" data-i18n="title">バーチャル彼女</div>
             </div>
             <div class="status-right">
                 <div class="status-item" id="connectionStatus">
                     <span class="status-dot offline"></span>
                 </div>
+                <button class="btn-icon" id="languageBtn" title="Language">
+                    🌐
+                </button>
                 <button class="btn-icon" id="settingsBtn" title="Settings">
                     ⚙
                 </button>
@@ -39,15 +46,15 @@
             <!-- Chat Toggle Button -->
             <button class="chat-toggle" id="chatToggle">
                 <span class="chat-icon">💬</span>
-                <span class="chat-text">Messages</span>
+<span class="chat-text">チャット</span>
             </button>
 
             <!-- Chat Panel -->
             <div class="chat-panel" id="chatPanel">
                 <div class="chat-header">
-                    <div class="chat-title">Messages</div>
+<div class="chat-title">チャット</div>
                     <div class="chat-actions">
-                        <button class="btn-mini" id="clearChatBtn">Clear</button>
+<button class="btn-mini" id="clearChatBtn">クリア</button>
                         <button class="btn-mini" id="closeChatBtn">×</button>
                     </div>
                 </div>
@@ -55,7 +62,7 @@
                 <div class="chat-messages" id="chatMessages">
                     <div class="message system">
                         <div class="message-content">
-                            <p>Welcome! I'm your AI assistant. How can I help you today?</p>
+<p>こんにちは！私があなたの彼女よ♪ 今日はどうしたの？</p>
                         </div>
                     </div>
                 </div>
@@ -65,7 +72,7 @@
                         <input 
                             type="text" 
                             id="messageInput" 
-                            placeholder="Type your message..." 
+placeholder="メッセージを入力してね...♪" 
                             disabled
                         >
                         <button class="btn-send" id="sendBtn" disabled>
@@ -73,7 +80,7 @@
                         </button>
                     </div>
                     <div class="typing-indicator" id="typingIndicator" style="display: none;">
-                        <span>AI is responding...</span>
+<span>彼女が返事を考えています...</span>
                         <div class="typing-dots">
                             <span></span>
                             <span></span>
@@ -87,16 +94,16 @@
         <!-- Control Bar (Bottom Center) -->
         <div class="control-bar">
             <button class="btn-control btn-start" id="startBtn">
-                <div class="control-icon">▶</div>
-                <div class="control-text">Start</div>
+                <div class="control-icon">▶️</div>
+                <div class="control-text">通話開始</div>
             </button>
             <button class="btn-control btn-stop" id="stopBtn" disabled>
-                <div class="control-icon">⏹</div>
-                <div class="control-text">Stop</div>
+                <div class="control-icon">⏹️</div>
+                <div class="control-text">通話終了</div>
             </button>
             <button class="btn-control btn-mute" id="muteBtn" disabled>
-                <div class="control-icon" id="muteIcon">🎤</div>
-                <div class="control-text" id="muteText">Mute</div>
+                <div class="control-icon" id="muteIcon">🎙️</div>
+                <div class="control-text" id="muteText">ミュート</div>
             </button>
         </div>
 
@@ -104,36 +111,45 @@
         <div class="modal-overlay" id="settingsModal" style="display: none;">
             <div class="modal">
                 <div class="modal-header">
-                    <h2>Settings</h2>
+<h2>設定</h2>
                     <button class="btn-close" id="closeSettingsBtn">×</button>
                 </div>
                 <div class="modal-body">
                     <div class="setting-group">
-                        <label for="channelName">Channel Name:</label>
-                        <input type="text" id="channelName" value="anime-girlfriend-demo">
+<label for="channelName">ルーム名:</label>
+                        <input type="text" id="channelName" value="virtual-girlfriend-room">
                     </div>
                     <div class="setting-group">
-                        <label for="userName">Your Name:</label>
-                        <input type="text" id="userName" value="User" placeholder="Enter your name">
+<label for="userName">あなたの名前:</label>
+                        <input type="text" id="userName" value="User" placeholder="名前を入力してください">
                     </div>
                     <div class="setting-group">
                         <label class="checkbox-label">
                             <input type="checkbox" id="enableVoice" checked>
                             <span class="checkmark"></span>
-                            Enable Voice Chat
+音声チャットを有効にする
                         </label>
                     </div>
                     <div class="setting-group">
                         <label class="checkbox-label">
                             <input type="checkbox" id="enableAvatar" checked>
                             <span class="checkmark"></span>
-                            Enable Avatar
+ビデオ通話を有効にする
                         </label>
+                    </div>
+                    <div class="setting-group">
+                        <label for="languageSelect">言語:</label>
+                        <select id="languageSelect" class="language-select">
+                            <option value="ja">🇯🇵 日本語</option>
+                            <option value="en">🇺🇸 English</option>
+                            <option value="ko">🇰🇷 한국어</option>
+                            <option value="zh">🇨🇳 中文</option>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" id="cancelSettingsBtn">Cancel</button>
-                    <button class="btn btn-primary" id="saveSettingsBtn">Save</button>
+<button class="btn btn-secondary" id="cancelSettingsBtn">キャンセル</button>
+                    <button class="btn btn-primary" id="saveSettingsBtn">保存</button>
                 </div>
             </div>
         </div>
@@ -142,16 +158,48 @@
         <div class="loading-overlay" id="loadingOverlay" style="display: none;">
             <div class="loading-content">
                 <div class="spinner"></div>
-                <p>Connecting to AI assistant...</p>
+<p>彼女に接続しています...</p>
+            </div>
+        </div>
+        
+        <!-- Language Selector Modal -->
+        <div class="modal-overlay" id="languageModal" style="display: none;">
+            <div class="modal language-modal">
+                <div class="modal-header">
+                    <h2 data-i18n="language">Language</h2>
+                    <button class="btn-close" id="closeLanguageBtn">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="language-options">
+                        <div class="language-option" data-lang="ja">
+                            <span class="flag">🇯🇵</span>
+                            <span class="name">日本語</span>
+                        </div>
+                        <div class="language-option" data-lang="en">
+                            <span class="flag">🇺🇸</span>
+                            <span class="name">English</span>
+                        </div>
+                        <div class="language-option" data-lang="ko">
+                            <span class="flag">🇰🇷</span>
+                            <span class="name">한국어</span>
+                        </div>
+                        <div class="language-option" data-lang="zh">
+                            <span class="flag">🇨🇳</span>
+                            <span class="name">中文</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <script src="utils/i18n.js"></script>
     <script src="utils/config.js"></script>
     <script src="utils/agoraManager.js"></script>
     <script src="utils/avatarManager.js"></script>
     <script src="components/chat.js"></script>
     <script src="components/controls.js"></script>
+    <script src="components/language.js"></script>
     <script src="main.js"></script>
 </body>
 </html>

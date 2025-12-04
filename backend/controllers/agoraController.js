@@ -56,8 +56,8 @@ const startConversation = async (req, res) => {
         enable_string_uid: false,
         idle_timeout: 30,
         asr: {
-          vendor: process.env.ASR_VENDOR || "ares",
-          language: process.env.ASR_LANGUAGE || "en-US"
+          vendor: "ares",
+          language: "en-US"
         },
         llm: {
           url: process.env.LLM_URL,

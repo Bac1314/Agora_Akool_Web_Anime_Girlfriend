@@ -5,9 +5,7 @@
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "nodemon backend/server.js",
-    "dev:frontend": "live-server frontend --port=8080",
+    "dev": "nodemon backend/server.js",
     "build": "echo 'No build step required for vanilla JS frontend'",
     "test": "echo 'No tests specified'"
   },
@@ -19,9 +17,7 @@
     "express": "^4.18.2"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "live-server": "^1.2.0",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.1.7"
   },
   "keywords": [
     "agora",
