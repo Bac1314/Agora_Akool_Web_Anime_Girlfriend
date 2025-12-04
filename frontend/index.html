@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>AI Assistant - Agora ConvoAI Demo</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="/lib/agora-rtc-sdk-ng/AgoraRTC_N-production.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Full-Screen Avatar Background -->
+        <div class="avatar-fullscreen" id="avatarContainer">
+            <div class="avatar-placeholder" id="avatarPlaceholder">
+                <div class="avatar-icon">👤</div>
+                <p>Avatar Loading...</p>
+                <div class="pulse-animation"></div>
+            </div>
+            <div class="avatar-video" id="avatarVideo" style="display: none;"></div>
+        </div>
+
+        <!-- Top Status Bar -->
+        <div class="status-overlay">
+            <div class="status-left">
+                <div class="app-title">AI Assistant</div>
+            </div>
+            <div class="status-right">
+                <div class="status-item" id="connectionStatus">
+                    <span class="status-dot offline"></span>
+                </div>
+                <button class="btn-icon" id="settingsBtn" title="Settings">
+                    ⚙
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Overlay (Bottom) -->
+        <div class="chat-overlay" id="chatOverlay">
+            <!-- Chat Toggle Button -->
+            <button class="chat-toggle" id="chatToggle">
+                <span class="chat-icon">💬</span>
+                <span class="chat-text">Messages</span>
+            </button>
+
+            <!-- Chat Panel -->
+            <div class="chat-panel" id="chatPanel">
+                <div class="chat-header">
+                    <div class="chat-title">Messages</div>
+                    <div class="chat-actions">
+                        <button class="btn-mini" id="clearChatBtn">Clear</button>
+                        <button class="btn-mini" id="closeChatBtn">×</button>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message system">
+                        <div class="message-content">
+                            <p>Welcome! I'm your AI assistant. How can I help you today?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="messageInput" 
+                            placeholder="Type your message..." 
+                            disabled
+                        >
+                        <button class="btn-send" id="sendBtn" disabled>
+                            →
+                        </button>
+                    </div>
+                    <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                        <span>AI is responding...</span>
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Bar (Bottom Center) -->
+        <div class="control-bar">
+            <button class="btn-control btn-start" id="startBtn">
+                <div class="control-icon">▶</div>
+                <div class="control-text">Start</div>
+            </button>
+            <button class="btn-control btn-stop" id="stopBtn" disabled>
+                <div class="control-icon">⏹</div>
+                <div class="control-text">Stop</div>
+            </button>
+            <button class="btn-control btn-mute" id="muteBtn" disabled>
+                <div class="control-icon" id="muteIcon">🎤</div>
+                <div class="control-text" id="muteText">Mute</div>
+            </button>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal-overlay" id="settingsModal" style="display: none;">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button class="btn-close" id="closeSettingsBtn">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-group">
+                        <label for="channelName">Channel Name:</label>
+                        <input type="text" id="channelName" value="anime-girlfriend-demo">
+                    </div>
+                    <div class="setting-group">
+                        <label for="userName">Your Name:</label>
+                        <input type="text" id="userName" value="User" placeholder="Enter your name">
+                    </div>
+                    <div class="setting-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableVoice" checked>
+                            <span class="checkmark"></span>
+                            Enable Voice Chat
+                        </label>
+                    </div>
+                    <div class="setting-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableAvatar" checked>
+                            <span class="checkmark"></span>
+                            Enable Avatar
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelSettingsBtn">Cancel</button>
+                    <button class="btn btn-primary" id="saveSettingsBtn">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p>Connecting to AI assistant...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="utils/config.js"></script>
+    <script src="utils/agora.js"></script>
+    <script src="utils/avatar.js"></script>
+    <script src="components/chat.js"></script>
+    <script src="components/controls.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
