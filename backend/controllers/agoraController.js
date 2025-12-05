@@ -76,15 +76,31 @@ const startConversation = async (req, res) => {
           input_modalities: ["text"],
           output_modalities: ["text"]
         },
+        // tts: {
+        //   vendor: process.env.TTS_VENDOR || "microsoft",
+        //   params: {
+        //     key: process.env.TTS_API_KEY,
+        //     region: process.env.TTS_REGION || "japanwest",
+        //     voice_name: process.env.TTS_VOICE || "zh-CN-XiaoxiaoMultilingualNeural",
+        //     enable_words: false // send agent transcription even if tts fails
+        //   },
+        //   skipPatterns: [1, 2, 3, 4, 5, 6]
+        // },
         tts: {
-          vendor: process.env.TTS_VENDOR || "microsoft",
+          vendor: "cartesia",
           params: {
-            key: process.env.TTS_API_KEY,
-            region: process.env.TTS_REGION || "japanwest",
-            voice_name: process.env.TTS_VOICE || "zh-CN-XiaoxiaoMultilingualNeural",
-            enable_words: false // send agent transcription even if tts fails
-          },
-          skipPatterns: [1, 2, 3, 4, 5, 6]
+            api_key: process.env.CARTESIA_API_KEY,
+            model_id: "sonic-3",
+            voice: { 
+              mode: "id",
+              id: process.env.CARTESIA_VOICE_ID
+            },
+            output_format: { 
+              container: "raw",
+              sample_rate: 16000
+            },
+            language: "en"
+          }
         },
         avatar: {
           vendor: "akool",
@@ -160,10 +176,12 @@ const stopConversation = async (req, res) => {
 
     const auth = Buffer.from(`${process.env.AGORA_API_KEY}:${process.env.AGORA_API_SECRET}`).toString('base64');
     
-    await axios.post(
+    const response = await axios.post(
       `https://api.agora.io/api/conversational-ai-agent/v2/projects/${process.env.AGORA_APP_ID}/agents/${agentId}/leave`,
+      {},
       {
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Basic ${auth}`
         }
       }
