@@ -11,6 +11,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
+app.use('/src', express.static(path.join(__dirname, '../src')));
 app.use('/lib', express.static(path.join(__dirname, '../node_modules'), {
   setHeaders: (res, path) => {
     if (path.endsWith('.js')) {

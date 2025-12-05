@@ -33,6 +33,8 @@ class I18nManager {
                 endCall: '通話終了',
                 mute: 'ミュート',
                 unmute: 'ミュート解除',
+                muteVideo: 'ビデオミュート',
+                unmuteVideo: 'ビデオ解除',
                 
                 // Settings
                 settings: '設定',
@@ -76,6 +78,8 @@ class I18nManager {
                 endCall: 'End Call',
                 mute: 'Mute',
                 unmute: 'Unmute',
+                muteVideo: 'Mute Video',
+                unmuteVideo: 'Unmute Video',
                 
                 // Settings
                 settings: 'Settings',
@@ -119,6 +123,8 @@ class I18nManager {
                 endCall: '통화 종료',
                 mute: '음소거',
                 unmute: '음소거 해제',
+                muteVideo: '비디오 음소거',
+                unmuteVideo: '비디오 해제',
                 
                 // Settings
                 settings: '설정',
@@ -162,6 +168,8 @@ class I18nManager {
                 endCall: '结束通话', 
                 mute: '静音',
                 unmute: '取消静音',
+                muteVideo: '静音视频',
+                unmuteVideo: '取消静音视频',
                 
                 // Settings
                 settings: '设置',

@@ -1,37 +1,46 @@
 class ControlsManager {
     constructor() {
-        this.startButton = null;
-        this.stopButton = null;
+        this.callButton = null;
         this.muteButton = null;
+        this.videoMuteButton = null;
         this.settingsButton = null;
         this.loadingOverlay = null;
         this.isMuted = false;
+        this.isVideoMuted = false;
         this.isStarted = false;
         
-        this.handleStart = this.handleStart.bind(this);
-        this.handleStop = this.handleStop.bind(this);
+        this.handleCall = this.handleCall.bind(this);
         this.handleMute = this.handleMute.bind(this);
+        this.handleVideoMute = this.handleVideoMute.bind(this);
         this.handleSettings = this.handleSettings.bind(this);
     }
 
     initialize() {
         try {
-            this.startButton = document.getElementById('startBtn');
-            this.stopButton = document.getElementById('stopBtn');
+            this.callButton = document.getElementById('callBtn');
             this.muteButton = document.getElementById('muteBtn');
+            this.videoMuteButton = document.getElementById('videoMuteBtn');
             this.settingsButton = document.getElementById('settingsBtn');
             this.loadingOverlay = document.getElementById('loadingOverlay');
 
-            if (!this.startButton || !this.stopButton) {
+            if (!this.callButton) {
                 throw new Error('Required control elements not found');
             }
 
-            this.startButton.addEventListener('click', this.handleStart);
-            this.stopButton.addEventListener('click', this.handleStop);
+            this.callButton.addEventListener('click', this.handleCall);
             this.muteButton?.addEventListener('click', this.handleMute);
+            this.videoMuteButton?.addEventListener('click', this.handleVideoMute);
             this.settingsButton?.addEventListener('click', this.handleSettings);
 
             this.updateControlStates();
+            
+            // Listen for language changes
+            window.addEventListener('languageChanged', () => {
+                this.updateCallButton();
+                this.updateMuteButton();
+                this.updateVideoMuteButton();
+            });
+            
             console.log('Controls manager initialized');
             return true;
 
@@ -41,61 +50,52 @@ class ControlsManager {
         }
     }
 
-    async handleStart() {
+    async handleCall() {
         try {
-            if (this.isStarted) return;
-
-            this.showLoading('Connecting to AI assistant...');
-            
-            const settings = this.getSettings();
-            const result = await window.agoraManager.startConversation(settings);
-            
-            if (result.success) {
-                this.isStarted = true;
+            if (!this.isStarted) {
+                // Start call
+                this.showLoading('Connecting to AI assistant...');
+                
+                const settings = this.getSettings();
+                const result = await window.agoraManager.startConversation(settings);
+                
+                if (result.success) {
+                    this.isStarted = true;
+                    this.updateControlStates();
+                    window.chatManager.enableChat();
+                    
+                    window.chatManager.sendMessage(
+                        `Connected! Welcome ${settings.userName}. I'm ready to assist you.`,
+                        'ai'
+                    );
+                    
+                    UTILS.showToast('Successfully connected to AI assistant!', 'success');
+                }
+                
+            } else {
+                // End call
+                this.showLoading('Disconnecting...');
+                
+                await window.agoraManager.stopConversation();
+                
+                this.isStarted = false;
+                this.isMuted = false;
+                this.isVideoMuted = false;
                 this.updateControlStates();
-                window.chatManager.enableChat();
+                window.chatManager.disableChat();
                 
                 window.chatManager.sendMessage(
-                    `Connected! Welcome ${settings.userName}. I'm ready to assist you.`,
-                    'ai'
+                    'Conversation ended. Thank you for using our AI assistant service.',
+                    'system'
                 );
                 
-                UTILS.showToast('Successfully connected to AI assistant!', 'success');
+                UTILS.showToast('Disconnected successfully', 'info');
             }
             
         } catch (error) {
-            console.error('Failed to start conversation:', error);
-            UTILS.showToast(`Failed to start: ${error.message}`, 'error');
+            console.error('Failed to toggle call:', error);
+            UTILS.showToast(`Failed to ${this.isStarted ? 'stop' : 'start'}: ${error.message}`, 'error');
             this.updateControlStates();
-            
-        } finally {
-            this.hideLoading();
-        }
-    }
-
-    async handleStop() {
-        try {
-            if (!this.isStarted) return;
-
-            this.showLoading('Disconnecting...');
-            
-            await window.agoraManager.stopConversation();
-            
-            this.isStarted = false;
-            this.isMuted = false;
-            this.updateControlStates();
-            window.chatManager.disableChat();
-            
-            window.chatManager.sendMessage(
-                'Conversation ended. Thank you for using our AI assistant service.',
-                'system'
-            );
-            
-            UTILS.showToast('Disconnected successfully', 'info');
-            
-        } catch (error) {
-            console.error('Failed to stop conversation:', error);
-            UTILS.showToast(`Failed to stop: ${error.message}`, 'error');
             
         } finally {
             this.hideLoading();
@@ -120,42 +120,123 @@ class ControlsManager {
         }
     }
 
+    async handleVideoMute() {
+        try {
+            if (!this.isStarted) return;
+
+            const wasVideoMuted = this.isVideoMuted;
+            this.isVideoMuted = await window.agoraManager.toggleVideoMute();
+            
+            this.updateVideoMuteButton();
+            
+            const status = this.isVideoMuted ? 'muted' : 'unmuted';
+            UTILS.showToast(`Video ${status}`, 'info');
+            
+        } catch (error) {
+            console.error('Failed to toggle video mute:', error);
+            UTILS.showToast(`Failed to toggle video mute: ${error.message}`, 'error');
+        }
+    }
+
     handleSettings() {
         const modal = new SettingsModal();
         modal.show();
     }
 
     updateControlStates() {
-        if (this.startButton) {
-            this.startButton.disabled = this.isStarted;
-        }
-        
-        if (this.stopButton) {
-            this.stopButton.disabled = !this.isStarted;
-        }
+        this.updateCallButton();
         
         if (this.muteButton) {
             this.muteButton.disabled = !this.isStarted;
         }
         
+        if (this.videoMuteButton) {
+            this.videoMuteButton.disabled = !this.isStarted;
+        }
+        
         this.updateMuteButton();
+        this.updateVideoMuteButton();
+    }
+
+    updateCallButton() {
+        if (!this.callButton) return;
+        
+        const callIconImg = this.callButton.querySelector('#callIconImg');
+        const callText = this.callButton.querySelector('#callText');
+        
+        if (this.isStarted) {
+            // Show end call state (red)
+            this.callButton.setAttribute('data-state', 'end');
+            if (callIconImg) {
+                callIconImg.src = '/src/assets/end.svg';
+                callIconImg.alt = 'End Call';
+            }
+            if (callText) {
+                if (window.i18n) {
+                    callText.textContent = window.i18n.t('endCall');
+                } else {
+                    callText.textContent = 'End Call';
+                }
+            }
+        } else {
+            // Show start call state (green)
+            this.callButton.setAttribute('data-state', 'start');
+            if (callIconImg) {
+                callIconImg.src = '/src/assets/call.svg';
+                callIconImg.alt = 'Start Call';
+            }
+            if (callText) {
+                if (window.i18n) {
+                    callText.textContent = window.i18n.t('startCall');
+                } else {
+                    callText.textContent = 'Start Call';
+                }
+            }
+        }
     }
 
     updateMuteButton() {
         if (!this.muteButton) return;
         
-        const muteIcon = this.muteButton.querySelector('#muteIcon');
+        const muteOverlay = this.muteButton.querySelector('#muteOverlay');
         const muteText = this.muteButton.querySelector('#muteText');
         
-        if (muteIcon) {
-            muteIcon.textContent = this.isMuted ? '🔊' : '🎤';
+        if (muteOverlay) {
+            muteOverlay.style.display = this.isMuted ? 'block' : 'none';
         }
         
         if (muteText) {
-            muteText.textContent = this.isMuted ? 'Unmute' : 'Mute';
+            const textKey = this.isMuted ? 'unmute' : 'mute';
+            if (window.i18n) {
+                muteText.textContent = window.i18n.t(textKey);
+            } else {
+                muteText.textContent = this.isMuted ? 'Unmute' : 'Mute';
+            }
         }
         
         this.muteButton.classList.toggle('muted', this.isMuted);
+    }
+
+    updateVideoMuteButton() {
+        if (!this.videoMuteButton) return;
+        
+        const videoMuteOverlay = this.videoMuteButton.querySelector('#videoMuteOverlay');
+        const videoMuteText = this.videoMuteButton.querySelector('#videoMuteText');
+        
+        if (videoMuteOverlay) {
+            videoMuteOverlay.style.display = this.isVideoMuted ? 'block' : 'none';
+        }
+        
+        if (videoMuteText) {
+            const textKey = this.isVideoMuted ? 'unmuteVideo' : 'muteVideo';
+            if (window.i18n) {
+                videoMuteText.textContent = window.i18n.t(textKey);
+            } else {
+                videoMuteText.textContent = this.isVideoMuted ? 'Unmute Video' : 'Mute Video';
+            }
+        }
+        
+        this.videoMuteButton.classList.toggle('muted', this.isVideoMuted);
     }
 
     showLoading(message = 'Loading...') {

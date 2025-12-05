@@ -23,7 +23,7 @@ html, body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background: linear-gradient(135deg, #2b1b3d 0%, #5a4fcf 25%, #ff6b9d 75%, #2b1b3d 100%);
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 25%, #404040 75%, #1a1a1a 100%);
 }
 
 /* Full-Screen Avatar Background */
@@ -36,7 +36,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #1e1640 0%, #2b1b3d 25%, #3d2c5e 75%, #1e1640 100%);
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 25%, #2d2d2d 75%, #0f0f0f 100%);
     z-index: 1;
 }
 
@@ -44,6 +44,10 @@ html, body {
     text-align: center;
     color: rgba(255, 255, 255, 0.6);
     animation: breathe 3s ease-in-out infinite;
+}
+
+.avatar-placeholder .loader {
+    margin: 0 auto 2rem auto;
 }
 
 .avatar-icon {
@@ -448,24 +452,24 @@ html, body {
     cursor: not-allowed;
 }
 
-.btn-control.btn-start {
-    background: linear-gradient(135deg, #ff6b9d, #c44569);
-    border-color: rgba(255, 107, 157, 0.5);
+.btn-control.btn-call[data-state="start"] {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border-color: rgba(46, 204, 113, 0.5);
 }
 
-.btn-control.btn-start:hover:not(:disabled) {
-    background: linear-gradient(135deg, #ff8fab, #d63384);
-    box-shadow: 0 12px 40px rgba(255, 107, 157, 0.6);
+.btn-control.btn-call[data-state="start"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2ecc71, #58d68d);
+    box-shadow: 0 12px 40px rgba(46, 204, 113, 0.6);
 }
 
-.btn-control.btn-stop {
-    background: linear-gradient(135deg, #6c5ce7, #5a4fcf);
-    border-color: rgba(108, 92, 231, 0.5);
+.btn-control.btn-call[data-state="end"] {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    border-color: rgba(231, 76, 60, 0.5);
 }
 
-.btn-control.btn-stop:hover:not(:disabled) {
-    background: linear-gradient(135deg, #7d70e8, #6b5edb);
-    box-shadow: 0 12px 40px rgba(108, 92, 231, 0.6);
+.btn-control.btn-call[data-state="end"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ec7063, #e74c3c);
+    box-shadow: 0 12px 40px rgba(231, 76, 60, 0.6);
 }
 
 .control-icon {
@@ -906,5 +910,102 @@ html, body {
     
     .chat-messages {
         max-height: 200px;
+    }
+}
+
+/* SVG Icon Styles */
+.icon-svg {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    transition: all 0.3s ease;
+}
+
+.btn-control:hover .icon-svg {
+    transform: scale(1.1);
+}
+
+/* Updated Button Colors - All same except start/end */
+.btn-control.btn-mute,
+.btn-control.btn-video-mute {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-control.btn-mute:hover:not(:disabled),
+.btn-control.btn-video-mute:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 12px 40px rgba(255, 255, 255, 0.3);
+}
+
+/* Muted State Overlay */
+.mute-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.mute-overlay::after {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+    background: linear-gradient(45deg, transparent 40%, #ff4757 40%, #ff4757 60%, transparent 60%);
+    border-radius: 50%;
+}
+
+/* New Animated Loader */
+.loader {
+    width: 80px;
+    aspect-ratio: 1.154;
+    background: repeating-conic-gradient(from -30deg, #027B7F 0 60deg, #FFA588 0 120deg, #BF1E62 0 180deg);
+    animation: l13 1.5s infinite alternate;
+    margin: 0 auto 20px;
+}
+
+@keyframes l13 {
+    0%,
+    10% {
+        clip-path: polygon(50% 50%, 25% 100%, 25% 100%, 25% 100%, 25% 100%, 75% 100%, 75% 100%, 75% 100%);
+    }
+    33%,
+    43% {
+        clip-path: polygon(50% 50%, 0 50%, 0 50%, 0 50%, 25% 100%, 75% 100%, 100% 50%, 100% 50%);
+    }
+    66%,
+    76% {
+        clip-path: polygon(50% 50%, 25% 0, 25% 0, 0 50%, 25% 100%, 75% 100%, 100% 50%, 75% 0);
+    }
+    95%,
+    100% {
+        clip-path: polygon(50% 50%, 75% 0, 25% 0, 0 50%, 25% 100%, 75% 100%, 100% 50%, 75% 0);
+    }
+}
+
+/* Control Icon Position Fix */
+.control-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive adjustments for new buttons */
+@media (max-width: 768px) {
+    .icon-svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .icon-svg {
+        width: 18px;
+        height: 18px;
     }
 }

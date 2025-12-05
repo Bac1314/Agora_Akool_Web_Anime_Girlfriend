@@ -12,13 +12,8 @@
         <!-- Full-Screen Avatar Background -->
         <div class="avatar-fullscreen" id="avatarContainer">
             <div class="avatar-placeholder" id="avatarPlaceholder">
-                <div class="avatar-icon">👩‍💻</div>
-                <p>彼女を呼んでいます...</p>
-                <div class="loading-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
+                <div class="loader"></div>
+                <p data-i18n="avatarLoading">彼女を呼んでいます...</p>
             </div>
             <div class="avatar-video" id="avatarVideo" style="display: none;"></div>
         </div>
@@ -46,15 +41,15 @@
             <!-- Chat Toggle Button -->
             <button class="chat-toggle" id="chatToggle">
                 <span class="chat-icon">💬</span>
-<span class="chat-text">チャット</span>
+<span class="chat-text" data-i18n="chat">チャット</span>
             </button>
 
             <!-- Chat Panel -->
             <div class="chat-panel" id="chatPanel">
                 <div class="chat-header">
-<div class="chat-title">チャット</div>
+<div class="chat-title" data-i18n="chat">チャット</div>
                     <div class="chat-actions">
-<button class="btn-mini" id="clearChatBtn">クリア</button>
+<button class="btn-mini" id="clearChatBtn" data-i18n="clear">クリア</button>
                         <button class="btn-mini" id="closeChatBtn">×</button>
                     </div>
                 </div>
@@ -62,7 +57,7 @@
                 <div class="chat-messages" id="chatMessages">
                     <div class="message system">
                         <div class="message-content">
-<p>こんにちは！私があなたの彼女よ♪ 今日はどうしたの？</p>
+<p data-i18n="welcomeMessage">こんにちは！私があなたの彼女よ♪ 今日はどうしたの？</p>
                         </div>
                     </div>
                 </div>
@@ -72,7 +67,8 @@
                         <input 
                             type="text" 
                             id="messageInput" 
-placeholder="メッセージを入力してね...♪" 
+data-i18n="messagePlaceholder"
+                            placeholder="メッセージを入力してね...♪" 
                             disabled
                         >
                         <button class="btn-send" id="sendBtn" disabled>
@@ -80,7 +76,7 @@ placeholder="メッセージを入力してね...♪"
                         </button>
                     </div>
                     <div class="typing-indicator" id="typingIndicator" style="display: none;">
-<span>彼女が返事を考えています...</span>
+<span data-i18n="responding">彼女が返事を考えています...</span>
                         <div class="typing-dots">
                             <span></span>
                             <span></span>
@@ -93,17 +89,25 @@ placeholder="メッセージを入力してね...♪"
 
         <!-- Control Bar (Bottom Center) -->
         <div class="control-bar">
-            <button class="btn-control btn-start" id="startBtn">
-                <div class="control-icon">▶️</div>
-                <div class="control-text">通話開始</div>
-            </button>
-            <button class="btn-control btn-stop" id="stopBtn" disabled>
-                <div class="control-icon">⏹️</div>
-                <div class="control-text">通話終了</div>
+            <button class="btn-control btn-call" id="callBtn" data-state="start">
+                <div class="control-icon" id="callIcon">
+                    <img src="/src/assets/call.svg" alt="Start Call" class="icon-svg" id="callIconImg">
+                </div>
+                <div class="control-text" id="callText" data-i18n="startCall">通話開始</div>
             </button>
             <button class="btn-control btn-mute" id="muteBtn" disabled>
-                <div class="control-icon" id="muteIcon">🎙️</div>
-                <div class="control-text" id="muteText">ミュート</div>
+                <div class="control-icon" id="muteIcon">
+                    <img src="/src/assets/microphone.svg" alt="Mute Audio" class="icon-svg">
+                    <div class="mute-overlay" id="muteOverlay" style="display: none;"></div>
+                </div>
+                <div class="control-text" id="muteText" data-i18n="mute">ミュート</div>
+            </button>
+            <button class="btn-control btn-video-mute" id="videoMuteBtn" disabled>
+                <div class="control-icon" id="videoMuteIcon">
+                    <img src="/src/assets/webcam.svg" alt="Mute Video" class="icon-svg">
+                    <div class="mute-overlay" id="videoMuteOverlay" style="display: none;"></div>
+                </div>
+                <div class="control-text" id="videoMuteText" data-i18n="muteVideo">ビデオミュート</div>
             </button>
         </div>
 
@@ -111,34 +115,34 @@ placeholder="メッセージを入力してね...♪"
         <div class="modal-overlay" id="settingsModal" style="display: none;">
             <div class="modal">
                 <div class="modal-header">
-<h2>設定</h2>
+<h2 data-i18n="settings">設定</h2>
                     <button class="btn-close" id="closeSettingsBtn">×</button>
                 </div>
                 <div class="modal-body">
                     <div class="setting-group">
-<label for="channelName">ルーム名:</label>
+<label for="channelName" data-i18n="roomName">ルーム名:</label>
                         <input type="text" id="channelName" value="virtual-girlfriend-room">
                     </div>
                     <div class="setting-group">
-<label for="userName">あなたの名前:</label>
-                        <input type="text" id="userName" value="User" placeholder="名前を入力してください">
+<label for="userName" data-i18n="yourName">あなたの名前:</label>
+                        <input type="text" id="userName" value="User" data-i18n="namePlaceholder" placeholder="名前を入力してください">
                     </div>
                     <div class="setting-group">
                         <label class="checkbox-label">
                             <input type="checkbox" id="enableVoice" checked>
                             <span class="checkmark"></span>
-音声チャットを有効にする
+<span data-i18n="enableVoice">音声チャットを有効にする</span>
                         </label>
                     </div>
                     <div class="setting-group">
                         <label class="checkbox-label">
                             <input type="checkbox" id="enableAvatar" checked>
                             <span class="checkmark"></span>
-ビデオ通話を有効にする
+<span data-i18n="enableVideo">ビデオ通話を有効にする</span>
                         </label>
                     </div>
                     <div class="setting-group">
-                        <label for="languageSelect">言語:</label>
+                        <label for="languageSelect" data-i18n="language">言語:</label>
                         <select id="languageSelect" class="language-select">
                             <option value="ja">🇯🇵 日本語</option>
                             <option value="en">🇺🇸 English</option>
@@ -148,8 +152,8 @@ placeholder="メッセージを入力してね...♪"
                     </div>
                 </div>
                 <div class="modal-footer">
-<button class="btn btn-secondary" id="cancelSettingsBtn">キャンセル</button>
-                    <button class="btn btn-primary" id="saveSettingsBtn">保存</button>
+<button class="btn btn-secondary" id="cancelSettingsBtn" data-i18n="cancel">キャンセル</button>
+                    <button class="btn btn-primary" id="saveSettingsBtn" data-i18n="save">保存</button>
                 </div>
             </div>
         </div>
@@ -157,8 +161,8 @@ placeholder="メッセージを入力してね...♪"
         <!-- Loading Overlay -->
         <div class="loading-overlay" id="loadingOverlay" style="display: none;">
             <div class="loading-content">
-                <div class="spinner"></div>
-<p>彼女に接続しています...</p>
+                <div class="loader"></div>
+                <p data-i18n="connecting">彼女に接続しています...</p>
             </div>
         </div>
         

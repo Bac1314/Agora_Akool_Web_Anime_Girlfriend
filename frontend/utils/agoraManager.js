@@ -241,6 +241,34 @@ class AgoraManager {
         }
     }
 
+    async toggleMute() {
+        try {
+            if (!this.localAudioTrack) {
+                throw new Error('No audio track available');
+            }
+            const isMuted = !this.localAudioTrack.enabled;
+            await this.localAudioTrack.setEnabled(isMuted);
+            
+            console.log(`Audio ${isMuted ? 'unmuted' : 'muted'}`);
+            return !isMuted;
+        } catch (error) {
+            console.error('Failed to toggle mute:', error);
+            throw error;
+        }
+    }
+
+    async toggleVideoMute() {
+        try {
+            // For now, return the current state as this is primarily for avatar display
+            // In a full implementation, this would toggle local video track
+            console.log('Video mute toggled (placeholder implementation)');
+            return true; // Placeholder - always return muted state for now
+        } catch (error) {
+            console.error('Failed to toggle video mute:', error);
+            throw error;
+        }
+    }
+
     getConnectionInfo() {
         return {
             isConnected: this.isConnected,
