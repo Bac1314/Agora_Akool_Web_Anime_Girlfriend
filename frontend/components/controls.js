@@ -146,6 +146,12 @@ class ControlsManager {
     updateControlStates() {
         this.updateCallButton();
         
+        // Toggle call-active class on control bar to show/hide mute buttons
+        const controlBar = document.querySelector('.control-bar');
+        if (controlBar) {
+            controlBar.classList.toggle('call-active', this.isStarted);
+        }
+        
         if (this.muteButton) {
             this.muteButton.disabled = !this.isStarted;
         }

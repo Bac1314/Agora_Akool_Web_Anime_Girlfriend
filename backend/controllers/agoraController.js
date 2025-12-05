@@ -64,7 +64,7 @@ const startConversation = async (req, res) => {
           api_key: process.env.LLM_API_KEY,
           system_messages: [
             {
-              role: "developer",
+              role: "system",
               content: process.env.LLM_SYSTEM_PROMPT || "You are a friendly AI anime girlfriend. Respond naturally in a caring, playful manner. Keep responses brief and conversational since this is voice-to-voice communication. Avoid long paragraphs and speak as if having a real conversation. Only output plain text responses, without any markdown, HTML tags, or emojis."
             }
           ],
@@ -80,10 +80,11 @@ const startConversation = async (req, res) => {
           vendor: process.env.TTS_VENDOR || "microsoft",
           params: {
             key: process.env.TTS_API_KEY,
-            region: process.env.TTS_REGION,
-            voice_name: process.env.TTS_VOICE || "en-US-AvaMultilingualNeural",
-            enable_words: false
-          }
+            region: process.env.TTS_REGION || "japanwest",
+            voice_name: process.env.TTS_VOICE || "zh-CN-XiaoxiaoMultilingualNeural",
+            enable_words: false // send agent transcription even if tts fails
+          },
+          skipPatterns: [1, 2, 3, 4, 5, 6]
         },
         avatar: {
           vendor: "akool",
@@ -91,7 +92,8 @@ const startConversation = async (req, res) => {
           params: {
             api_key: process.env.AKOOL_API_KEY,
             quality: "medium",
-            agora_uid: avatarUid.toString()
+            agora_uid: avatarUid.toString(), 
+            avatar_id: process.env.AKOOL_AVATAR_ID || "dvp_Emma_agora"
           }
         },
         advanced_features: {
@@ -158,8 +160,8 @@ const stopConversation = async (req, res) => {
 
     const auth = Buffer.from(`${process.env.AGORA_API_KEY}:${process.env.AGORA_API_SECRET}`).toString('base64');
     
-    await axios.delete(
-      `https://api.agora.io/api/conversational-ai-agent/v2/projects/${process.env.AGORA_APP_ID}/agents/${agentId}`,
+    await axios.post(
+      `https://api.agora.io/api/conversational-ai-agent/v2/projects/${process.env.AGORA_APP_ID}/agents/${agentId}/leave`,
       {
         headers: {
           'Authorization': `Basic ${auth}`
