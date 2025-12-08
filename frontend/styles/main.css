@@ -946,6 +946,38 @@ html, body {
     transform: scale(1.1);
 }
 
+/* Debug Info Styles */
+.debug-info {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-family: monospace;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.debug-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 2px 0;
+    min-width: 160px;
+}
+
+.debug-label {
+    color: #ccc;
+    margin-right: 8px;
+}
+
+.debug-value {
+    color: #888;
+    font-weight: bold;
+}
+
 /* Updated Button Colors - All same except start/end */
 .btn-control.btn-mute,
 .btn-control.btn-video-mute {

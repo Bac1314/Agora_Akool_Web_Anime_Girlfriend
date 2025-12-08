@@ -13,7 +13,7 @@
         <div class="avatar-fullscreen" id="avatarContainer">
             <div class="avatar-placeholder" id="avatarPlaceholder">
                 <div class="loader"></div>
-                <p data-i18n="avatarLoading">彼女を呼んでいます...</p>
+                <p data-i18n="avatarLoading">Click 'Start Call' to connect</p>
             </div>
             <div class="avatar-video" id="avatarVideo" style="display: none;"></div>
         </div>
@@ -21,7 +21,7 @@
         <!-- Top Status Bar -->
         <div class="status-overlay">
             <div class="status-left">
-<div class="app-title" data-i18n="title">バーチャル彼女</div>
+<div class="app-title" data-i18n="title">Virtual Girlfriend</div>
             </div>
             <div class="status-right">
                 <div class="status-item" id="connectionStatus">
@@ -57,7 +57,7 @@
                 <div class="chat-messages" id="chatMessages">
                     <div class="message system">
                         <div class="message-content">
-<p data-i18n="welcomeMessage">こんにちは！私があなたの彼女よ♪ 今日はどうしたの？</p>
+<p data-i18n="welcomeMessage">Hello! I'm your girlfriend ♪ How are you today?</p>
                         </div>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                             type="text" 
                             id="messageInput" 
 data-i18n="messagePlaceholder"
-                            placeholder="メッセージを入力してね...♪" 
+                            placeholder="Type your message... ♪" 
                             disabled
                         >
                         <button class="btn-send" id="sendBtn" disabled>
@@ -76,7 +76,7 @@ data-i18n="messagePlaceholder"
                         </button>
                     </div>
                     <div class="typing-indicator" id="typingIndicator" style="display: none;">
-<span data-i18n="responding">彼女が返事を考えています...</span>
+<span data-i18n="responding">She is thinking of a response...</span>
                         <div class="typing-dots">
                             <span></span>
                             <span></span>
@@ -93,7 +93,7 @@ data-i18n="messagePlaceholder"
                 <div class="control-icon" id="callIcon">
                     <img src="/src/assets/call.svg" alt="Start Call" class="icon-svg" id="callIconImg">
                 </div>
-                <div class="control-text" id="callText" data-i18n="startCall">通話開始</div>
+                <div class="control-text" id="callText" data-i18n="startCall">Start Call</div>
             </button>
             <button class="btn-control btn-mute" id="muteBtn" disabled>
                 <div class="control-icon" id="muteIcon">
@@ -113,30 +113,30 @@ data-i18n="messagePlaceholder"
         <div class="modal-overlay" id="settingsModal" style="display: none;">
             <div class="modal">
                 <div class="modal-header">
-<h2 data-i18n="settings">設定</h2>
+<h2 data-i18n="settings">Settings</h2>
                     <button class="btn-close" id="closeSettingsBtn">×</button>
                 </div>
                 <div class="modal-body">
                     <div class="setting-group">
-<label for="channelName" data-i18n="roomName">ルーム名:</label>
+<label for="channelName" data-i18n="roomName">Room Name:</label>
                         <input type="text" id="channelName" value="virtual-girlfriend-room">
                     </div>
                     <div class="setting-group">
-<label for="userName" data-i18n="yourName">あなたの名前:</label>
-                        <input type="text" id="userName" value="User" data-i18n="namePlaceholder" placeholder="名前を入力してください">
+<label for="userName" data-i18n="yourName">Your Name:</label>
+                        <input type="text" id="userName" value="User" data-i18n="namePlaceholder" placeholder="Enter your name">
                     </div>
                     <div class="setting-group">
                         <label class="checkbox-label">
                             <input type="checkbox" id="enableVoice" checked>
                             <span class="checkmark"></span>
-<span data-i18n="enableVoice">音声チャットを有効にする</span>
+<span data-i18n="enableVoice">Enable Voice Chat</span>
                         </label>
                     </div>
                     <div class="setting-group">
                         <label class="checkbox-label">
                             <input type="checkbox" id="enableAvatar" checked>
                             <span class="checkmark"></span>
-<span data-i18n="enableVideo">ビデオ通話を有効にする</span>
+<span data-i18n="enableVideo">Enable Video Call</span>
                         </label>
                     </div>
                     <div class="setting-group">
@@ -150,8 +150,8 @@ data-i18n="messagePlaceholder"
                     </div>
                 </div>
                 <div class="modal-footer">
-<button class="btn btn-secondary" id="cancelSettingsBtn" data-i18n="cancel">キャンセル</button>
-                    <button class="btn btn-primary" id="saveSettingsBtn" data-i18n="save">保存</button>
+<button class="btn btn-secondary" id="cancelSettingsBtn" data-i18n="cancel">Cancel</button>
+                    <button class="btn btn-primary" id="saveSettingsBtn" data-i18n="save">Save</button>
                 </div>
             </div>
         </div>
@@ -160,7 +160,7 @@ data-i18n="messagePlaceholder"
         <div class="loading-overlay" id="loadingOverlay" style="display: none;">
             <div class="loading-content">
                 <div class="loader"></div>
-                <p data-i18n="connecting">彼女に接続しています...</p>
+                <p data-i18n="connecting">Connecting to your girlfriend...</p>
             </div>
         </div>
         
@@ -192,6 +192,22 @@ data-i18n="messagePlaceholder"
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Debug Info -->
+    <div class="debug-info" id="debugInfo" style="display: none;">
+        <div class="debug-item">
+            <span class="debug-label">Channel:</span>
+            <span class="debug-value" id="debugChannel">-</span>
+        </div>
+        <div class="debug-item">
+            <span class="debug-label">User:</span>
+            <span class="debug-value" id="debugUser">-</span>
+        </div>
+        <div class="debug-item">
+            <span class="debug-label">Agent:</span>
+            <span class="debug-value" id="debugAgent">-</span>
         </div>
     </div>
 

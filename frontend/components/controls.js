@@ -54,7 +54,7 @@ class ControlsManager {
         try {
             if (!this.isStarted) {
                 // Start call
-                this.showLoading('Connecting to AI assistant...');
+                this.showLoading(window.i18n.t('connectingToAI'));
                 
                 const settings = this.getSettings();
                 const result = await window.agoraManager.startConversation(settings);
@@ -63,6 +63,21 @@ class ControlsManager {
                     this.isStarted = true;
                     this.updateControlStates();
                     window.chatManager.enableChat();
+                    
+                    // Update and show debug info
+                    if (window.app && window.app.updateDebugInfo) {
+                        window.app.updateDebugInfo({
+                            channel: settings.channel,
+                            user: settings.userName,
+                            agentId: result.agentId || 'N/A'
+                        });
+                        // Show debug info automatically after connection
+                        setTimeout(() => {
+                            if (window.app.debugInfo && window.app.debugInfo.panel) {
+                                window.app.debugInfo.panel.style.display = 'block';
+                            }
+                        }, 1000);
+                    }
                     
                     window.chatManager.sendMessage(
                         `Connected! Welcome ${settings.userName}. I'm ready to assist you.`,
@@ -74,7 +89,7 @@ class ControlsManager {
                 
             } else {
                 // End call
-                this.showLoading('Disconnecting...');
+                this.showLoading(window.i18n.t('disconnecting'));
                 
                 await window.agoraManager.stopConversation();
                 
@@ -83,6 +98,16 @@ class ControlsManager {
                 this.isVideoMuted = false;
                 this.updateControlStates();
                 window.chatManager.disableChat();
+                
+                // Hide debug info on disconnect
+                if (window.app && window.app.debugInfo && window.app.debugInfo.panel) {
+                    window.app.debugInfo.panel.style.display = 'none';
+                }
+                
+                // Small delay to show disconnection loading
+                setTimeout(() => {
+                    this.hideLoading();
+                }, 800);
                 
                 window.chatManager.sendMessage(
                     'Conversation ended. Thank you for using our AI assistant service.',
@@ -106,7 +131,6 @@ class ControlsManager {
         try {
             if (!this.isStarted) return;
 
-            const wasMuted = this.isMuted;
             this.isMuted = await window.agoraManager.toggleMute();
             
             this.updateMuteButton();
@@ -124,7 +148,6 @@ class ControlsManager {
         try {
             if (!this.isStarted) return;
 
-            const wasVideoMuted = this.isVideoMuted;
             this.isVideoMuted = await window.agoraManager.toggleVideoMute();
             
             this.updateVideoMuteButton();
@@ -263,7 +286,7 @@ class ControlsManager {
 
     getSettings() {
         return {
-            channel: STORAGE.get('channelName', CONFIG.DEFAULT_CHANNEL),
+            channel: STORAGE.get('channelName') || UTILS.generateChannelName(),
             userName: STORAGE.get('userName', CONFIG.DEFAULT_USER_NAME),
             enableVoice: STORAGE.get('enableVoice', true),
             enableAvatar: STORAGE.get('enableAvatar', true)
@@ -314,7 +337,7 @@ class SettingsModal {
 
     loadCurrentSettings() {
         if (this.channelInput) {
-            this.channelInput.value = STORAGE.get('channelName', CONFIG.DEFAULT_CHANNEL);
+            this.channelInput.value = STORAGE.get('channelName') || UTILS.generateChannelName();
         }
         
         if (this.userNameInput) {
@@ -351,7 +374,7 @@ class SettingsModal {
     saveSettings() {
         try {
             const settings = {
-                channelName: this.channelInput?.value?.trim() || CONFIG.DEFAULT_CHANNEL,
+                channelName: this.channelInput?.value?.trim() || UTILS.generateChannelName(),
                 userName: this.userNameInput?.value?.trim() || CONFIG.DEFAULT_USER_NAME,
                 enableVoice: this.enableVoiceCheckbox?.checked ?? true,
                 enableAvatar: this.enableAvatarCheckbox?.checked ?? true

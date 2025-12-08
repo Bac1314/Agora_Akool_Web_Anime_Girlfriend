@@ -5,6 +5,14 @@ class I18nManager {
         this.translations = {};
         this.loadTranslations();
         this.loadStoredLanguage();
+        
+        // Ensure UI updates when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.updateUI());
+        } else {
+            // DOM is already ready
+            setTimeout(() => this.updateUI(), 0);
+        }
     }
 
     loadTranslations() {
@@ -15,10 +23,10 @@ class I18nManager {
                 connecting: '彼女に接続しています...',
                 connected: '接続済み',
                 disconnected: '切断',
-                calling: '彼女を呼んでいます...',
+                calling: "'通話開始'をクリックして接続",
                 
                 // Avatar & Loading
-                avatarLoading: '彼女を呼んでいます...',
+                avatarLoading: "'通話開始'をクリックして接続",
                 
                 // Chat
                 chat: 'チャット',
@@ -47,6 +55,10 @@ class I18nManager {
                 cancel: 'キャンセル',
                 save: '保存',
                 
+                // Connection States
+                connectingToAI: 'AIアシスタントに接続中...',
+                disconnecting: '切断中...',
+                
                 // Languages
                 japanese: '日本語',
                 english: 'English',
@@ -60,10 +72,10 @@ class I18nManager {
                 connecting: 'Connecting to your girlfriend...',
                 connected: 'Connected',
                 disconnected: 'Disconnected',
-                calling: 'Calling your girlfriend...',
+                calling: "Click 'Start Call' to connect",
                 
                 // Avatar & Loading
-                avatarLoading: 'Calling your girlfriend...',
+                avatarLoading: "Click 'Start Call' to connect",
                 
                 // Chat
                 chat: 'Chat',
@@ -92,6 +104,10 @@ class I18nManager {
                 cancel: 'Cancel',
                 save: 'Save',
                 
+                // Connection States
+                connectingToAI: 'Connecting to AI assistant...',
+                disconnecting: 'Disconnecting...',
+                
                 // Languages
                 japanese: 'Japanese',
                 english: 'English',
@@ -105,10 +121,10 @@ class I18nManager {
                 connecting: '여자친구와 연결 중...',
                 connected: '연결됨',
                 disconnected: '연결 끊김',
-                calling: '여자친구를 부르는 중...',
+                calling: "'통화 시작'을 클릭하여 연결",
                 
                 // Avatar & Loading
-                avatarLoading: '여자친구를 부르는 중...',
+                avatarLoading: "'통화 시작'을 클릭하여 연결",
                 
                 // Chat
                 chat: '채팅',
@@ -137,6 +153,10 @@ class I18nManager {
                 cancel: '취소',
                 save: '저장',
                 
+                // Connection States
+                connectingToAI: 'AI 어시스턴트에 연결 중...',
+                disconnecting: '연결 해제 중...',
+                
                 // Languages
                 japanese: '일본어',
                 english: '영어',
@@ -150,10 +170,10 @@ class I18nManager {
                 connecting: '正在连接您的女友...',
                 connected: '已连接',
                 disconnected: '已断开',
-                calling: '正在呼叫您的女友...',
+                calling: "点击'开始通话'连接",
                 
                 // Avatar & Loading
-                avatarLoading: '正在呼叫您的女友...',
+                avatarLoading: "点击'开始通话'连接",
                 
                 // Chat
                 chat: '聊天',
@@ -181,6 +201,10 @@ class I18nManager {
                 language: '语言:',
                 cancel: '取消',
                 save: '保存',
+                
+                // Connection States
+                connectingToAI: '正在连接AI助手...',
+                disconnecting: '正在断开连接...',
                 
                 // Languages
                 japanese: '日语',

@@ -38,7 +38,7 @@ class AgoraManager {
 
     async startConversation(settings = {}) {
         try {
-            const channel = settings.channel || CONFIG.DEFAULT_CHANNEL;
+            const channel = settings.channel || UTILS.generateChannelName();
             const userName = settings.userName || CONFIG.DEFAULT_USER_NAME;
             const userUID = 123;
 
@@ -123,6 +123,7 @@ class AgoraManager {
 
             this.updateConnectionStatus('offline');
             this.updateAvatarStatus('offline');
+            this.hideAvatar();
 
             console.log('Conversation stopped successfully');
             return true;
@@ -214,7 +215,7 @@ class AgoraManager {
         
         if (avatarContainer && placeholder) {
             avatarContainer.style.display = 'none';
-            placeholder.style.display = 'flex';
+            // placeholder.style.display = 'flex';
             avatarContainer.innerHTML = '';
             
             console.log('Avatar video hidden');

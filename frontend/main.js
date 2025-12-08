@@ -20,6 +20,8 @@ class App {
             window.avatarManager = this.avatarManager;
             window.chatManager = this.chatManager;
             window.controlsManager = this.controlsManager;
+            
+            this.initializeDebugInfo();
 
             await this.avatarManager.initialize();
 
@@ -131,6 +133,45 @@ class App {
             
         } catch (error) {
             console.error('❌ Error during cleanup:', error);
+        }
+    }
+    
+    initializeDebugInfo() {
+        this.debugInfo = {
+            panel: document.getElementById('debugInfo'),
+            channel: document.getElementById('debugChannel'),
+            user: document.getElementById('debugUser'),
+            agent: document.getElementById('debugAgent')
+        };
+        
+        // Show debug info on Ctrl+Shift+D
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                this.toggleDebugInfo();
+            }
+        });
+        
+        this.updateDebugInfo();
+    }
+    
+    toggleDebugInfo() {
+        if (this.debugInfo.panel) {
+            const isVisible = this.debugInfo.panel.style.display !== 'none';
+            this.debugInfo.panel.style.display = isVisible ? 'none' : 'block';
+        }
+    }
+    
+    updateDebugInfo(data = {}) {
+        if (!this.debugInfo) return;
+        
+        if (data.channel && this.debugInfo.channel) {
+            this.debugInfo.channel.textContent = data.channel;
+        }
+        if (data.user && this.debugInfo.user) {
+            this.debugInfo.user.textContent = data.user;
+        }
+        if (data.agentId && this.debugInfo.agent) {
+            this.debugInfo.agent.textContent = data.agentId;
         }
     }
 }
