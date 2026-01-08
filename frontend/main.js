@@ -20,7 +20,12 @@ class App {
             window.avatarManager = this.avatarManager;
             window.chatManager = this.chatManager;
             window.controlsManager = this.controlsManager;
-            
+
+            // Connect RTM messages to chat
+            this.agoraManager.setMessageCallback((rtmData) => {
+                this.chatManager.receiveRtmMessage(rtmData);
+            });
+
             this.initializeDebugInfo();
 
             await this.avatarManager.initialize();
@@ -34,10 +39,10 @@ class App {
                 this.isInitialized = true;
                 this.setupGlobalErrorHandlers();
                 this.showWelcomeMessage();
-                
+
                 console.log('✅ App initialized successfully!');
                 UTILS.showToast('Welcome to AI Anime Girlfriend!', 'success');
-                
+
                 return true;
             } else {
                 throw new Error('Failed to initialize some components');

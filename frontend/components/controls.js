@@ -131,13 +131,13 @@ class ControlsManager {
         try {
             if (!this.isStarted) return;
 
-            this.isMuted = await window.agoraManager.toggleMute();
-            
+            this.isMuted = await window.agoraManager.toggleAudioMute();
+
             this.updateMuteButton();
-            
+
             const status = this.isMuted ? 'muted' : 'unmuted';
             UTILS.showToast(`Microphone ${status}`, 'info');
-            
+
         } catch (error) {
             console.error('Failed to toggle mute:', error);
             UTILS.showToast(`Failed to toggle mute: ${error.message}`, 'error');

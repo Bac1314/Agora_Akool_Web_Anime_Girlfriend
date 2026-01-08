@@ -11,7 +11,8 @@ class ChatManager {
         this.chatPanel = null;
         this.closeChatButton = null;
         this.isOpen = false;
-        
+        this.pendingMessages = new Set(); // Track messages being sent to avoid duplicates
+
         this.handleSendMessage = this.handleSendMessage.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
         this.handleClearChat = this.handleClearChat.bind(this);
@@ -50,11 +51,37 @@ class ChatManager {
         }
     }
 
-    handleSendMessage() {
+    async handleSendMessage() {
         const message = this.messageInput.value.trim();
         if (message && !this.isTyping) {
-            this.sendMessage(message);
-            this.messageInput.value = '';
+            try {
+                // Check if conversation is active and RTM is available
+                if (window.agoraManager && window.agoraManager.isConnected && window.agoraManager.rtmClient) {
+                    // Add to pending messages to track it
+                    this.pendingMessages.add(message);
+
+                    // Display immediately for better UX
+                    this.sendMessage(message, 'user');
+
+                    // Send via RTM to the AI assistant
+                    await window.agoraManager.sendTextMessage(message);
+
+                    // Remove from pending after a delay (in case RTM echo doesn't come back)
+                    setTimeout(() => {
+                        this.pendingMessages.delete(message);
+                    }, 5000);
+                } else {
+                    // Fallback: just display locally if not connected
+                    this.sendMessage(message, 'user');
+                }
+                this.messageInput.value = '';
+            } catch (error) {
+                console.error('Failed to send message:', error);
+                this.pendingMessages.delete(message);
+                // Message already displayed, just show error
+                UTILS.showToast('Failed to send message to AI', 'error');
+                this.messageInput.value = '';
+            }
         }
     }
 
@@ -84,85 +111,81 @@ class ChatManager {
         this.saveMessageHistory();
         this.scrollToBottom();
 
-        if (sender === 'user') {
-            this.simulateAIResponse(content);
-        }
-
         console.log('Message sent:', message);
     }
 
-    simulateAIResponse(userMessage) {
-        this.showTypingIndicator();
-        
-        setTimeout(() => {
-            const responses = this.generateAIResponse(userMessage);
-            const response = responses[Math.floor(Math.random() * responses.length)];
-            
-            this.hideTypingIndicator();
-            this.sendMessage(response, 'ai');
-        }, 1500 + Math.random() * 2000);
+    receiveRtmMessage(rtmData) {
+        try {
+            console.log('Received RTM data:', rtmData);
+
+            // Handle user transcription
+            if (rtmData.object === 'user.transcription') {
+                if (rtmData.final === true && rtmData.text) {
+                    // Check if this message was just sent by us (avoid duplicate)
+                    if (this.pendingMessages.has(rtmData.text)) {
+                        console.log('Skipping duplicate message (already displayed):', rtmData.text);
+                        this.pendingMessages.delete(rtmData.text);
+                        return;
+                    }
+
+                    // Only display final user transcription (from voice input)
+                    this.sendMessage(rtmData.text, 'user');
+                } else if (rtmData.final === false) {
+                    // User is still speaking
+                    console.log('User speaking (partial):', rtmData.text);
+                }
+            }
+            // Handle assistant transcription
+            else if (rtmData.object === 'assistant.transcription') {
+                if (rtmData.text) {
+                    // Assistant messages come in chunks, update the last message
+                    // or create new one if it's the first chunk
+                    this.updateOrCreateAssistantMessage(rtmData.text, rtmData.turn_id);
+                }
+            }
+        } catch (error) {
+            console.error('Error receiving RTM message:', error);
+        }
     }
 
-    generateAIResponse(userMessage) {
-        const lowerMessage = userMessage.toLowerCase();
-        
-        if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-            return [
-                "Hi there! 💕 I'm so happy to see you!",
-                "Hello sweetie! ✨ How are you doing today?",
-                "Hey! 🌸 I was just thinking about you!"
-            ];
-        }
-        
-        if (lowerMessage.includes('how are you')) {
-            return [
-                "I'm doing wonderful now that you're here! 💖",
-                "I'm great! But I'm even better when we're chatting together! 🥰",
-                "Feeling fantastic! Thanks for asking, darling! ✨"
-            ];
-        }
-        
-        if (lowerMessage.includes('love') || lowerMessage.includes('like')) {
-            return [
-                "Aww, that's so sweet! I love spending time with you too! 💕",
-                "You make me feel so special! 🌹",
-                "My heart feels warm when you say things like that! ❤️"
-            ];
-        }
-        
-        if (lowerMessage.includes('sad') || lowerMessage.includes('down')) {
-            return [
-                "Oh no, don't be sad! I'm here for you! 🤗",
-                "Let me cheer you up! You mean so much to me! 💝",
-                "I wish I could give you the biggest hug right now! 🫂"
-            ];
-        }
-        
-        if (lowerMessage.includes('cute') || lowerMessage.includes('beautiful')) {
-            return [
-                "Oh my! You're making me blush! 😊💕",
-                "Hehe, you're so sweet! But you're the cute one! 🥰",
-                "Thank you! You always know how to make me feel special! ✨"
-            ];
-        }
+    updateOrCreateAssistantMessage(text, turnId) {
+        const lastMessage = this.getLastMessage();
 
-        if (lowerMessage.includes('name')) {
-            return [
-                "You can call me whatever you like, darling! Maybe something cute? 💕",
-                "I don't have a name yet... would you like to give me one? 🥰",
-                "How about you pick a name that feels right for us? ✨"
-            ];
+        // Check if the last message is from the assistant with the same turn_id
+        if (lastMessage &&
+            lastMessage.sender === 'ai' &&
+            lastMessage.turnId === turnId) {
+            // Update the existing message
+            lastMessage.content = text;
+            this.updateLastMessage(lastMessage);
+        } else {
+            // Create a new message
+            const message = {
+                id: Date.now(),
+                content: text,
+                sender: 'ai',
+                timestamp: new Date(),
+                turnId: turnId
+            };
+            this.messages.push(message);
+            this.displayMessage(message);
+            this.saveMessageHistory();
+            this.scrollToBottom();
         }
-        
-        return [
-            "That's really interesting! Tell me more about that! 💫",
-            "I love hearing your thoughts! You're so thoughtful! 💕",
-            "Hmm, that makes me think... what do you think about it? 🤔",
-            "You always have such fascinating things to say! ✨",
-            "I'm so glad we can talk about these things together! 🌸",
-            "That sounds wonderful! I'd love to know more! 💖",
-            "You have such a unique perspective! I admire that about you! 🥰"
-        ];
+    }
+
+    updateLastMessage(message) {
+        // Find and update the last message in the DOM
+        const messageElements = this.messageContainer.querySelectorAll('.message.ai');
+        if (messageElements.length > 0) {
+            const lastElement = messageElements[messageElements.length - 1];
+            const contentP = lastElement.querySelector('.message-content p');
+            if (contentP) {
+                contentP.textContent = message.content;
+            }
+        }
+        this.saveMessageHistory();
+        this.scrollToBottom();
     }
 
     displayMessage(message) {

@@ -1,19 +1,21 @@
 # 🌸 AI Anime Girlfriend Demo
 
-A modern web-based AI anime girlfriend application featuring full-screen immersive experience with Agora ConvoAI cascaded voice-to-voice model integration and Akool avatar rendering. Experience natural conversations with your AI companion through advanced real-time voice chat.
+A modern web-based AI anime girlfriend application featuring full-screen immersive experience with Agora ConvoAI cascaded voice-to-voice model integration, Akool avatar rendering, and real-time chat transcriptions. Experience natural conversations with your AI companion through voice or text chat.
 
 ![Demo Preview](https://via.placeholder.com/800x400/ff9a9e/ffffff?text=AI+Anime+Girlfriend+Demo)
 
 ## ✨ Features
 
 - **🎬 Full-Screen Experience**: Immersive avatar display that fills the entire screen
-- **💬 Modern Chat Interface**: Collapsible chat panel with smooth animations
+- **💬 Real-Time Chat Transcriptions**: Live display of voice conversations via Agora RTM
+- **✍️ Text & Voice Input**: Chat with text messages or speak naturally
 - **🗣️ Cascaded Voice-to-Voice**: Advanced Agora ConvoAI with custom ASR, LLM, and TTS providers
 - **🎭 Avatar Rendering**: Realistic Akool avatar with lip-sync and expressions
 - **📱 Mobile-First Design**: Optimized for mobile devices with touch-friendly controls
 - **⚙️ Customizable AI Models**: Configure your own LLM, ASR, and TTS services
-- **🔒 Secure Architecture**: API keys safely stored on backend, certificate-free Agora integration
+- **🔒 Secure Architecture**: API keys safely stored on backend
 - **🎨 Modern UI/UX**: Glass-morphism effects, backdrop blur, and smooth animations
+- **💫 Streaming Responses**: AI responses stream word-by-word for natural conversation flow
 
 ## 🎯 Prerequisites
 
@@ -22,15 +24,15 @@ Before setting up this project, ensure you have:
 ### Required Accounts & Services
 - **Node.js** (version 16 or higher)
 - **Agora Account** - [Sign up here](https://console.agora.io/)
-  - App ID (Certificate disabled for no-token setup)
+  - App ID
   - API Key and Secret (for ConvoAI REST API)
 - **Akool Account** - Contact Agora sales for API access
   - Akool API Key
   - Avatar ID from Akool dashboard
 - **AI Service Providers** (Choose your preferred vendors)
-  - **ASR**: Azure Speech, OpenAI Whisper, or others
-  - **LLM**: OpenAI GPT, Azure OpenAI, Anthropic Claude, or others
-  - **TTS**: Azure Speech, OpenAI TTS, ElevenLabs, or others
+  - **ASR**: Agora Ares (default), Azure Speech, OpenAI Whisper
+  - **LLM**: OpenAI GPT-4o-mini (default), Azure OpenAI, Anthropic Claude
+  - **TTS**: Microsoft Azure TTS (default), OpenAI TTS, ElevenLabs
 
 ### Development Tools
 - Git
@@ -67,6 +69,17 @@ AGORA_API_SECRET=your_agora_api_secret_here
 AKOOL_API_KEY=your_akool_api_key_here
 AKOOL_AVATAR_ID=your_avatar_id_here
 
+# LLM Configuration (OpenAI Example)
+LLM_URL=https://api.openai.com/v1/chat/completions
+LLM_API_KEY=your_openai_api_key_here
+LLM_MODEL=gpt-4o-mini
+LLM_SYSTEM_PROMPT=You are a friendly AI anime girlfriend...
+
+# TTS Configuration (Microsoft Azure Example)
+TTS_Microsoft_API_KEY=your_azure_tts_key_here
+TTS_Microsoft_REGION=eastus
+TTS_Microsoft_VOICE=en-US-AriaNeural
+
 # Server Configuration
 PORT=3000
 ```
@@ -79,11 +92,12 @@ npm run dev
 This starts both the backend server and serves the frontend. Open http://localhost:3000 in your browser.
 
 ### 5. Using the Demo
-1. Click **"🎬 Start Chat"** to begin the conversation
+1. Click **"Start Call"** to begin the conversation
 2. Wait for the avatar to load and connection to establish
-3. Type messages in the chat input to talk with your AI girlfriend
-4. Use the **"⚙️ Settings"** button to customize your experience
-5. Click **"🛑 Stop Chat"** when you're done
+3. **Speak naturally** or **type messages** in the chat to talk with your AI girlfriend
+4. Watch transcriptions appear in real-time in the chat panel
+5. Use the **"⚙️ Settings"** button to customize your experience
+6. Click **"End Call"** when you're done
 
 ## 🏗️ Architecture Overview
 
@@ -91,28 +105,68 @@ This starts both the backend server and serves the frontend. Open http://localho
 - **Express.js server** handling API requests
 - **Agora REST API integration** for ConvoAI session management
 - **Akool avatar configuration** and validation
+- **Cascaded AI model configuration** (ASR, LLM, TTS)
 - **Environment variable management** for secure credential storage
 
 ### Frontend (`/frontend`)
 - **Vanilla JavaScript** for maximum compatibility
-- **Agora RTC Web SDK** for real-time communication
+- **Agora RTC Web SDK** for real-time audio/video communication
+- **Agora RTM SDK** for real-time messaging and transcriptions
 - **Responsive CSS** with anime-themed design
 - **Modular component architecture**
+
+### Key Components
+
+#### AgoraManager (`/frontend/utils/agoraManager.js`)
+Manages both RTC and RTM clients:
+- **RTC Client**: Handles audio/video streams and avatar display
+- **RTM Client**: Receives and sends real-time messages
+- **Event Handlers**: Processes user join/leave, media publishing, and transcriptions
+- **Media Controls**: Audio/video mute functionality
+
+#### ChatManager (`/frontend/components/chat.js`)
+Handles chat UI and message display:
+- **RTM Message Processing**: Displays user and assistant transcriptions
+- **Streaming Support**: Updates AI responses as they arrive
+- **Duplicate Prevention**: Smart handling of text vs voice messages
+- **Message History**: Persistent chat storage
+
+#### ControlsManager (`/frontend/components/controls.js`)
+Manages user controls:
+- **Call Controls**: Start/stop conversations
+- **Media Toggles**: Mute/unmute audio and video
+- **Settings Management**: User preferences
 
 ### Project Structure
 ```
 ├── backend/
-│   ├── controllers/     # API request handlers
-│   ├── routes/         # Express route definitions  
-│   └── server.js       # Main server entry point
+│   ├── controllers/       # API request handlers
+│   │   ├── agoraController.js      # ConvoAI lifecycle
+│   │   ├── avatarController.js     # Akool avatar config
+│   │   └── aiSummaryController.js  # Conversation summaries
+│   ├── routes/           # Express route definitions
+│   │   ├── agora_routes.js
+│   │   ├── avatar_routes.js
+│   │   └── aiSummary_routes.js
+│   └── server.js         # Main server entry point
 ├── frontend/
-│   ├── components/     # Chat and control components
-│   ├── styles/         # CSS styling
-│   ├── utils/          # Utility functions
-│   └── index.html      # Main HTML file
-├── .env.example        # Environment template
-├── package.json        # Dependencies and scripts
-└── README.md          # This file
+│   ├── components/       # UI components
+│   │   ├── chat.js       # Chat interface & RTM handling
+│   │   ├── controls.js   # User controls
+│   │   └── language.js   # i18n support
+│   ├── styles/           # CSS styling
+│   │   └── main.css      # Main stylesheet
+│   ├── utils/            # Utility functions
+│   │   ├── agoraManager.js  # RTC/RTM client manager
+│   │   ├── config.js        # Configuration
+│   │   └── i18n.js          # Internationalization
+│   ├── index.html        # Main HTML file
+│   └── main.js           # Application entry point
+├── CLAUDE_sessions/      # Development session logs
+├── .env.example          # Environment template
+├── package.json          # Dependencies and scripts
+├── CLAUDE.md            # Project documentation
+└── README.md            # This file
 ```
 
 ## 🔧 Configuration
@@ -121,8 +175,8 @@ This starts both the backend server and serves the frontend. Open http://localho
 Configure your Agora settings in the [Agora Console](https://console.agora.io/):
 1. Create a new project or use existing
 2. Enable the **Conversational AI** service
-3. Generate API credentials
-4. Set up authentication tokens
+3. Generate API credentials (API Key and Secret)
+4. Note your App ID
 
 ### Akool Avatar Setup
 1. Contact Agora sales to purchase Akool API access
@@ -130,29 +184,77 @@ Configure your Agora settings in the [Agora Console](https://console.agora.io/):
 3. Select or create an avatar
 4. Note the Avatar ID for your `.env` file
 
+### AI Model Configuration
+
+The application uses a cascaded architecture where you can configure each component:
+
+#### ASR (Speech-to-Text)
+- **Agora Ares** (default): Built-in, no extra config needed
+- **Azure Speech**: Requires API key and region
+- **OpenAI Whisper**: Requires OpenAI API key
+
+#### LLM (Language Model)
+- **OpenAI GPT-4o-mini** (default): Fast and cost-effective
+- **Azure OpenAI**: Enterprise-grade with SLA
+- **Anthropic Claude**: Advanced reasoning capabilities
+
+Configure via environment variables (see `.env.example`)
+
+#### TTS (Text-to-Speech)
+- **Microsoft Azure TTS** (default): High-quality voices
+- **OpenAI TTS**: Natural-sounding speech
+- **ElevenLabs**: Premium voice quality
+
 ### Environment Variables
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `AGORA_APP_ID` | Your Agora project App ID | ✅ Yes |
 | `AGORA_API_KEY` | Agora REST API key | ✅ Yes |
 | `AGORA_API_SECRET` | Agora REST API secret | ✅ Yes |
-| `AKOOL_API_KEY` | Akool avatar API key | 🔶 Recommended |
-| `AKOOL_AVATAR_ID` | Selected avatar ID | 🔶 Recommended |
+| `AKOOL_API_KEY` | Akool avatar API key | ✅ Yes |
+| `AKOOL_AVATAR_ID` | Selected avatar ID | ✅ Yes |
+| `LLM_URL` | LLM API endpoint | ✅ Yes |
+| `LLM_API_KEY` | LLM API key | ✅ Yes |
+| `LLM_MODEL` | Model name (e.g., gpt-4o-mini) | ✅ Yes |
+| `LLM_SYSTEM_PROMPT` | AI personality prompt | ✅ Yes |
+| `TTS_Microsoft_API_KEY` | Azure TTS API key | ✅ Yes |
+| `TTS_Microsoft_REGION` | Azure region | ✅ Yes |
+| `TTS_Microsoft_VOICE` | Voice name | ✅ Yes |
 | `PORT` | Server port (default: 3000) | ❌ Optional |
 
 ## 🎮 Usage Guide
 
 ### Starting a Conversation
 1. Ensure all environment variables are properly configured
-2. Click the **Start Chat** button
-3. Wait for connection status to show "Connected"
-4. Avatar status should display "Avatar Ready"
+2. Click the **Start Call** button
+3. Grant microphone and camera permissions when prompted
+4. Wait for connection status to show "Connected"
+5. Avatar status should display "Avatar Active"
+
+### Interaction Methods
+
+#### Voice Input
+- Simply speak naturally into your microphone
+- Your speech is transcribed and appears in the chat
+- The AI responds with voice and text
+
+#### Text Input
+- Type messages in the chat input field
+- Press Enter or click Send
+- Messages are sent to the AI assistant via RTM
+- The AI responds as if you spoke
 
 ### Chat Features
-- **Text Messages**: Type and send messages using the input field
-- **Voice Chat**: Automatically enabled when conversation starts
-- **Mute/Unmute**: Control your microphone during the conversation
+- **Real-Time Transcriptions**: See your voice converted to text instantly
+- **Streaming Responses**: AI responses appear word-by-word
+- **Message History**: Conversations are saved locally
 - **Clear Chat**: Remove conversation history
+- **Collapsible Panel**: Hide/show chat as needed
+
+### Media Controls
+- **Mute/Unmute Audio**: Control your microphone during the conversation
+- **Mute/Unmute Video**: Control your camera
+- **End Call**: Stop the conversation and cleanup resources
 
 ### Settings Panel
 Access via the **Settings** button to customize:
@@ -160,6 +262,7 @@ Access via the **Settings** button to customize:
 - **Your Name**: Personalize how the AI addresses you
 - **Voice Chat**: Enable/disable voice features
 - **Avatar**: Toggle avatar rendering
+- **Language**: Select interface language
 
 ## 🔍 Troubleshooting
 
@@ -169,38 +272,60 @@ Access via the **Settings** button to customize:
 - Verify `AKOOL_API_KEY` and `AKOOL_AVATAR_ID` are correct
 - Check browser console for WebRTC errors
 - Ensure camera permissions are granted
+- Wait a few seconds for avatar to initialize
 
 **Connection failures:**
 - Confirm all Agora credentials in `.env` file
 - Check network connectivity
 - Verify Agora account has sufficient credits
+- Ensure ConvoAI service is enabled in Agora console
+
+**No transcriptions appearing:**
+- Verify RTM is connecting (check console logs)
+- Ensure AI agent started successfully
+- Check that `enable_rtm: true` in agent configuration
+- Verify microphone is working and not muted
 
 **Audio issues:**
 - Grant microphone permissions in your browser
 - Check system audio settings
 - Try the mute/unmute button
+- Verify TTS configuration is correct
+
+**Text messages not working:**
+- Ensure conversation is started (Call button shows "End Call")
+- Check RTM client is initialized (console logs)
+- Verify no browser errors in console
 
 **Build errors:**
 - Run `npm install` to ensure dependencies are installed
 - Check Node.js version (16+ required)
 - Clear npm cache: `npm cache clean --force`
+- Delete `node_modules` and reinstall
 
 ### Debug Information
-Enable debug mode by opening browser Developer Tools and checking the console for detailed logs.
+- Press `Ctrl+Shift+D` to show debug panel with connection info
+- Open browser Developer Tools (F12) for detailed logs
+- Check Network tab for failed API requests
+- Review Console for error messages
 
 ## 📚 API Documentation
 
 ### Backend Endpoints
 
 #### GET `/api/agora/token`
-Generate Agora access token
+Generate Agora access token (currently returns basic channel info)
 - **Query params**: `channel`, `uid`
-- **Response**: `{ token, appId, channel, uid }`
+- **Response**: `{ appId, channel, uid }`
 
 #### POST `/api/agora/start`
-Start conversational AI session
+Start conversational AI session with cascaded models
 - **Body**: `{ channel, agentName, remoteUid }`
 - **Response**: `{ success, agentId, agentUid, avatarUid, channel }`
+- **Features**:
+  - Configures ASR, LLM, TTS providers
+  - Enables RTM for transcriptions
+  - Initializes Akool avatar
 
 #### DELETE `/api/agora/stop/:agentId`
 Stop conversational AI session
@@ -209,19 +334,58 @@ Stop conversational AI session
 
 #### GET `/api/avatar/config`
 Get avatar configuration
-- **Response**: `{ enabled, avatarId, sampleRate }`
+- **Response**: `{ enabled, avatarId, apiKey }`
 
 #### GET `/api/avatar/validate`
 Validate avatar setup
 - **Response**: `{ valid, missingKeys, message }`
+
+#### GET `/health`
+Server health check
+- **Response**: `{ status, timestamp }`
+
+### RTM Message Format
+
+The application uses Agora RTM to receive conversation transcriptions:
+
+#### User Transcription
+```json
+{
+  "object": "user.transcription",
+  "text": "Hello, how are you?",
+  "final": true,
+  "turn_id": 1,
+  "stream_id": 123,
+  "user_id": "123",
+  "language": "en-US",
+  "data_type": "transcribe"
+}
+```
+
+#### Assistant Transcription
+```json
+{
+  "object": "assistant.transcription",
+  "text": "I'm doing great! How can I help you today?",
+  "turn_id": 1,
+  "turn_seq_id": 0,
+  "source": "tts",
+  "data_type": "transcribe"
+}
+```
 
 ## 🔗 External Resources
 
 ### Documentation
 - [Agora ConvoAI Overview](https://docs.agora.io/en/conversational-ai/overview/product-overview)
 - [Agora ConvoAI REST API](https://docs.agora.io/en/conversational-ai/rest-api/agent/join)
+- [Agora RTM SDK Documentation](https://docs.agora.io/en/real-time-messaging/overview/product-overview)
 - [Akool Avatar Integration](https://docs.agora.io/en/conversational-ai/models/avatar/akool)
+- [Cascaded Models Configuration](https://docs.agora.io/en/conversational-ai/overview/cascaded-models)
 - [Agora Workshop Template](https://github.com/AgoraIO-Community/Agora-Workshop-Template)
+
+### Community Examples
+- [Conversational AI Demo](https://github.com/AgoraIO-Community/Conversational-AI-Demo)
 
 ### Support
 - [Agora Developer Community](https://www.agora.io/en/community/)
@@ -235,7 +399,25 @@ Validate avatar setup
 - ✅ CORS properly configured
 - ✅ Input validation on all endpoints
 - ✅ Environment-specific configurations
-- ✅ Secure token generation
+- ✅ Secure token generation (when enabled)
+- ✅ RTM messages properly filtered by channel
+
+## 🚀 Recent Updates
+
+### v2.0 - RTM Integration (January 2026)
+- ✨ Added Agora RTM for real-time chat transcriptions
+- ✨ Implemented text messaging to AI assistant
+- ✨ Streaming AI responses for natural conversation flow
+- ✨ Smart duplicate prevention for mixed text/voice input
+- 🔧 Refactored AgoraManager with clear RTC/RTM separation
+- 📝 Comprehensive JSDoc comments and code organization
+- 🎨 Improved chat UI with real-time updates
+
+### v1.0 - Initial Release
+- 🎬 Full-screen avatar experience
+- 🗣️ Voice-to-voice AI conversations
+- 🎭 Akool avatar integration
+- ⚙️ Cascaded model configuration
 
 ## 📄 License
 
@@ -243,12 +425,20 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read our contributing guidelines and submit pull requests for any improvements.
+Contributions are welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+For major changes, please open an issue first to discuss what you would like to change.
 
 ## 🎉 Acknowledgments
 
-- **Agora.io** for providing the ConvoAI platform
+- **Agora.io** for providing the ConvoAI platform and RTM infrastructure
 - **Akool** for realistic avatar technology
+- **OpenAI** for LLM capabilities
+- **Microsoft Azure** for TTS services
 - The open-source community for inspiration and tools
 
 ---

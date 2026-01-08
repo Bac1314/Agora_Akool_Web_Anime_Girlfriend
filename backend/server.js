@@ -2,8 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const agoraRoutes = require('./routes/agora');
-const avatarRoutes = require('./routes/avatar');
+const agoraRoutes = require('./routes/agora_routes');
+const avatarRoutes = require('./routes/avatar_routes');
+const aiSummaryRoutes = require('./routes/aiSummary_routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.use('/lib', express.static(path.join(__dirname, '../node_modules'), {
 
 app.use('/api/agora', agoraRoutes);
 app.use('/api/avatar', avatarRoutes);
+app.use('/api/ai-summary', aiSummaryRoutes);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
