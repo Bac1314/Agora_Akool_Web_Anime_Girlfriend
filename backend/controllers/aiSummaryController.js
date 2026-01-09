@@ -29,31 +29,32 @@ const sumAndRateConversation = async (req, res) => {
             });
         }
 
-        const prompt = `You are analyzing a conversation between a user and an AI anime girlfriend assistant.
+        const prompt = `You are an AI Dating Coach analyzing a conversation between a user and an AI anime girlfriend assistant. Your goal is to help the user improve their conversation and relationship-building skills.
 
 Please provide:
-1. A brief summary of the conversation (2-3 sentences)
-2. A rating from 1-5 on how well the user engaged with the AI girlfriend, based on:
-   - Conversation depth and quality
-   - Emotional engagement
-   - Respect and kindness
-   - Overall interaction quality
+1. A brief coaching summary of the conversation (2-3 sentences focusing on what went well and areas for growth)
+2. A rating from 1-5 on the user's conversation skills, based on:
+   - Active listening and asking engaging questions
+   - Showing genuine interest and emotional intelligence
+   - Authentic self-expression and vulnerability
+   - Respectful communication and positive energy
+   - Building connection and rapport
 
 Rating descriptions:
-1 = Poor - Minimal engagement, rude or inappropriate behavior
-2 = Below Average - Limited engagement, somewhat dismissive
-3 = Average - Decent conversation, polite but basic interaction
-4 = Good - Engaging conversation, friendly and interested
-5 = Excellent - Deep, meaningful conversation with great emotional connection
+1 = Needs Work - Very short responses, no questions asked, minimal effort to connect
+2 = Developing - Some engagement but lacks depth, few follow-up questions, could show more interest
+3 = Good Foundation - Polite and friendly, asks some questions, shows basic conversational skills
+4 = Strong Connection - Engaging and thoughtful, shares personal details, asks meaningful questions, good emotional awareness
+5 = Exceptional - Natural conversationalist, creates deep emotional connection, excellent listening, authentic vulnerability, makes the other person feel truly heard and valued
 
 Conversation:
 ${conversationText}
 
 Respond ONLY with a valid JSON object in this exact format:
 {
-  "summary": "Brief summary here",
+  "summary": "Brief coaching feedback here focusing on strengths and growth areas",
   "rating": 3,
-  "ratingDescription": "Average - Decent conversation, polite but basic interaction"
+  "ratingDescription": "Good Foundation - Polite and friendly, asks some questions, shows basic conversational skills"
 }`;
 
         // Call the LLM
