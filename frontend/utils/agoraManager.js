@@ -147,6 +147,9 @@ class AgoraManager {
             this.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
             await this.rtcClient.publish([this.localAudioTrack, this.localVideoTrack]);
 
+            // Display user's camera preview
+            this.displayUserCamera(this.localVideoTrack);
+
             // Update connection state
             this.isConnected = true;
             this.currentChannel = channel;
@@ -246,6 +249,7 @@ class AgoraManager {
             this.updateConnectionStatus('offline');
             this.updateAvatarStatus('offline');
             this.hideAvatar();
+            this.hideUserCamera();
 
             console.log('Conversation stopped successfully');
             return true;
@@ -431,6 +435,13 @@ class AgoraManager {
             const isMuted = !this.localVideoTrack.enabled;
             await this.localVideoTrack.setEnabled(isMuted);
 
+            // Show or hide user camera preview based on mute state
+            if (isMuted) {
+                this.displayUserCamera(this.localVideoTrack);
+            } else {
+                this.hideUserCamera();
+            }
+
             console.log(`Video ${isMuted ? 'unmuted' : 'muted'}`);
             return !isMuted;
         } catch (error) {
@@ -473,6 +484,35 @@ class AgoraManager {
             avatarContainer.innerHTML = '';
 
             console.log('Avatar video hidden');
+        }
+    }
+
+    /**
+     * Display user's camera preview
+     * @param {MediaStreamTrack} videoTrack - Local video track to display
+     */
+    displayUserCamera(videoTrack) {
+        const cameraPreview = document.getElementById('userCameraPreview');
+        const cameraVideo = document.getElementById('userCameraVideo');
+
+        if (cameraPreview && cameraVideo && videoTrack) {
+            videoTrack.play(cameraVideo);
+            cameraPreview.style.display = 'block';
+            console.log('User camera preview displayed');
+        }
+    }
+
+    /**
+     * Hide user's camera preview
+     */
+    hideUserCamera() {
+        const cameraPreview = document.getElementById('userCameraPreview');
+        const cameraVideo = document.getElementById('userCameraVideo');
+
+        if (cameraPreview && cameraVideo) {
+            cameraPreview.style.display = 'none';
+            cameraVideo.innerHTML = '';
+            console.log('User camera preview hidden');
         }
     }
 

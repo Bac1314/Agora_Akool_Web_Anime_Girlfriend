@@ -58,7 +58,15 @@ class I18nManager {
                 // Connection States
                 connectingToAI: 'AIアシスタントに接続中...',
                 disconnecting: '切断中...',
-                
+
+                // Conversation Summary
+                conversationSummary: '会話の要約',
+                yourRating: '会話の評価',
+                summary: '要約',
+                analyzingConversation: '会話を分析中...',
+                done: '完了',
+                you: 'あなた',
+
                 // Languages
                 japanese: '日本語',
                 english: 'English',
@@ -107,7 +115,15 @@ class I18nManager {
                 // Connection States
                 connectingToAI: 'Connecting to AI assistant...',
                 disconnecting: 'Disconnecting...',
-                
+
+                // Conversation Summary
+                conversationSummary: 'Conversation Summary',
+                yourRating: 'Your Conversation Rating',
+                summary: 'Summary',
+                analyzingConversation: 'Analyzing your conversation...',
+                done: 'Done',
+                you: 'You',
+
                 // Languages
                 japanese: 'Japanese',
                 english: 'English',
@@ -156,7 +172,15 @@ class I18nManager {
                 // Connection States
                 connectingToAI: 'AI 어시스턴트에 연결 중...',
                 disconnecting: '연결 해제 중...',
-                
+
+                // Conversation Summary
+                conversationSummary: '대화 요약',
+                yourRating: '대화 평가',
+                summary: '요약',
+                analyzingConversation: '대화를 분석하는 중...',
+                done: '완료',
+                you: '당신',
+
                 // Languages
                 japanese: '일본어',
                 english: '영어',
@@ -205,7 +229,15 @@ class I18nManager {
                 // Connection States
                 connectingToAI: '正在连接AI助手...',
                 disconnecting: '正在断开连接...',
-                
+
+                // Conversation Summary
+                conversationSummary: '对话摘要',
+                yourRating: '对话评分',
+                summary: '摘要',
+                analyzingConversation: '正在分析您的对话...',
+                done: '完成',
+                you: '您',
+
                 // Languages
                 japanese: '日语',
                 english: '英语',

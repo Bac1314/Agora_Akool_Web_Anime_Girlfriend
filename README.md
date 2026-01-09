@@ -11,6 +11,7 @@ A modern web-based AI anime girlfriend application featuring full-screen immersi
 - **✍️ Text & Voice Input**: Chat with text messages or speak naturally
 - **🗣️ Cascaded Voice-to-Voice**: Advanced Agora ConvoAI with custom ASR, LLM, and TTS providers
 - **🎭 Avatar Rendering**: Realistic Akool avatar with lip-sync and expressions
+- **⭐ Conversation Summary & Rating**: AI analyzes each conversation and provides a 1-5 star rating with detailed summary
 - **📱 Mobile-First Design**: Optimized for mobile devices with touch-friendly controls
 - **⚙️ Customizable AI Models**: Configure your own LLM, ASR, and TTS services
 - **🔒 Secure Architecture**: API keys safely stored on backend
@@ -98,6 +99,7 @@ This starts both the backend server and serves the frontend. Open http://localho
 4. Watch transcriptions appear in real-time in the chat panel
 5. Use the **"⚙️ Settings"** button to customize your experience
 6. Click **"End Call"** when you're done
+7. View your **conversation summary and rating** - automatically shown after each session
 
 ## 🏗️ Architecture Overview
 
@@ -256,6 +258,19 @@ Configure via environment variables (see `.env.example`)
 - **Mute/Unmute Video**: Control your camera
 - **End Call**: Stop the conversation and cleanup resources
 
+### Conversation Summary & Rating
+After ending each conversation, you'll receive:
+- **AI-Generated Summary**: A 2-3 sentence overview of your conversation
+- **Star Rating (1-5)**: Based on conversation quality, engagement, and interaction
+- **Rating Description**: Detailed explanation of your rating
+  - ⭐ **1 Star - Poor**: Minimal engagement, rude or inappropriate behavior
+  - ⭐⭐ **2 Stars - Below Average**: Limited engagement, somewhat dismissive
+  - ⭐⭐⭐ **3 Stars - Average**: Decent conversation, polite but basic interaction
+  - ⭐⭐⭐⭐ **4 Stars - Good**: Engaging conversation, friendly and interested
+  - ⭐⭐⭐⭐⭐ **5 Stars - Excellent**: Deep, meaningful conversation with great emotional connection
+- **Animated Display**: Gold stars fill in with smooth animation
+- The modal appears automatically after ending each call
+
 ### Settings Panel
 Access via the **Settings** button to customize:
 - **Channel Name**: Change the conversation channel
@@ -340,6 +355,16 @@ Get avatar configuration
 Validate avatar setup
 - **Response**: `{ valid, missingKeys, message }`
 
+#### POST `/api/ai-summary/summarize-and-rate`
+Generate conversation summary and rating
+- **Body**: `{ transcript: [{ sender, content }, ...] }`
+- **Response**: `{ summary, rating, ratingDescription }`
+- **Features**:
+  - Uses configured LLM to analyze conversation
+  - Returns 1-5 star rating with criteria
+  - Provides 2-3 sentence summary
+  - Includes detailed rating description
+
 #### GET `/health`
 Server health check
 - **Response**: `{ status, timestamp }`
@@ -404,7 +429,15 @@ The application uses Agora RTM to receive conversation transcriptions:
 
 ## 🚀 Recent Updates
 
-### v2.0 - RTM Integration (January 2026)
+### v2.1 - Conversation Summary & Rating (January 9, 2026)
+- ⭐ AI-powered conversation analysis after each session
+- ⭐ 1-5 star rating system with detailed criteria
+- ⭐ Automatic summary generation using LLM
+- ⭐ Beautiful animated modal with gold star display
+- ⭐ Mobile-responsive design with glass-morphism effects
+- ⭐ Rating descriptions explaining conversation quality
+
+### v2.0 - RTM Integration (January 8, 2026)
 - ✨ Added Agora RTM for real-time chat transcriptions
 - ✨ Implemented text messaging to AI assistant
 - ✨ Streaming AI responses for natural conversation flow

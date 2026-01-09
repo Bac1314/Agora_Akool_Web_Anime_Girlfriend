@@ -73,7 +73,7 @@ const startConversation = async (req, res) => {
           params: {
             model: process.env.LLM_MODEL || "gpt-4o-mini"
           },
-          input_modalities: ["text"],
+          input_modalities: ["text", "image"],
           output_modalities: ["text"]
         },
         tts: {

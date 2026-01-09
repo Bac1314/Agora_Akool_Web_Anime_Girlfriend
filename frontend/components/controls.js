@@ -90,31 +90,34 @@ class ControlsManager {
             } else {
                 // End call
                 this.showLoading(window.i18n.t('disconnecting'));
-                
+
                 await window.agoraManager.stopConversation();
-                
+
                 this.isStarted = false;
                 this.isMuted = false;
                 this.isVideoMuted = false;
                 this.updateControlStates();
                 window.chatManager.disableChat();
-                
+
                 // Hide debug info on disconnect
                 if (window.app && window.app.debugInfo && window.app.debugInfo.panel) {
                     window.app.debugInfo.panel.style.display = 'none';
                 }
-                
+
                 // Small delay to show disconnection loading
                 setTimeout(() => {
                     this.hideLoading();
                 }, 800);
-                
+
                 window.chatManager.sendMessage(
                     'Conversation ended. Thank you for using our AI assistant service.',
                     'system'
                 );
-                
+
                 UTILS.showToast('Disconnected successfully', 'info');
+
+                // Show conversation summary and rating
+                this.showConversationSummary();
             }
             
         } catch (error) {
@@ -299,6 +302,158 @@ class ControlsManager {
 
     getMuteStatus() {
         return this.isMuted;
+    }
+
+    async showConversationSummary() {
+        const modal = new SummaryModal();
+        await modal.show();
+    }
+}
+
+class SummaryModal {
+    constructor() {
+        this.modal = null;
+        this.summaryLoading = null;
+        this.summaryContent = null;
+        this.summaryError = null;
+        this.starRating = null;
+        this.ratingDescription = null;
+        this.summaryText = null;
+    }
+
+    async show() {
+        this.modal = document.getElementById('summaryModal');
+        if (!this.modal) return;
+
+        this.initializeElements();
+        this.attachEventListeners();
+        this.modal.style.display = 'flex';
+
+        // Update i18n translations for modal
+        if (window.i18n) {
+            window.i18n.updateElementsWithI18n();
+        }
+
+        // Show loading state
+        this.showLoading();
+
+        // Get conversation transcript from chat manager
+        const transcript = window.chatManager.messages.filter(msg =>
+            msg.sender === 'user' || msg.sender === 'ai'
+        );
+
+        if (transcript.length === 0) {
+            this.showError('No conversation to summarize');
+            return;
+        }
+
+        try {
+            // Call backend API to get summary and rating
+            const response = await fetch('/api/ai-summary/summarize-and-rate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ transcript })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to generate summary');
+            }
+
+            const result = await response.json();
+            this.displaySummary(result);
+        } catch (error) {
+            console.error('Error generating summary:', error);
+            this.showError(error.message);
+        }
+    }
+
+    initializeElements() {
+        this.summaryLoading = document.getElementById('summaryLoading');
+        this.summaryContent = document.getElementById('summaryContent');
+        this.summaryError = document.getElementById('summaryError');
+        this.starRating = document.getElementById('starRating');
+        this.ratingDescription = document.getElementById('ratingDescription');
+        this.summaryText = document.getElementById('summaryText');
+    }
+
+    attachEventListeners() {
+        const closeBtn = document.getElementById('closeSummaryBtn');
+        const doneBtn = document.getElementById('closeSummaryDoneBtn');
+
+        if (closeBtn) closeBtn.addEventListener('click', () => this.hide());
+        if (doneBtn) doneBtn.addEventListener('click', () => this.hide());
+
+        if (this.modal) {
+            this.modal.addEventListener('click', (e) => {
+                if (e.target === this.modal) {
+                    this.hide();
+                }
+            });
+        }
+    }
+
+    showLoading() {
+        if (this.summaryLoading) this.summaryLoading.style.display = 'block';
+        if (this.summaryContent) this.summaryContent.style.display = 'none';
+        if (this.summaryError) this.summaryError.style.display = 'none';
+    }
+
+    displaySummary(result) {
+        if (this.summaryLoading) this.summaryLoading.style.display = 'none';
+        if (this.summaryContent) this.summaryContent.style.display = 'block';
+        if (this.summaryError) this.summaryError.style.display = 'none';
+
+        // Display star rating
+        if (this.starRating) {
+            const stars = this.starRating.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < result.rating) {
+                    star.classList.add('filled');
+                    // Stagger the animation
+                    setTimeout(() => {
+                        star.style.animationDelay = `${index * 0.1}s`;
+                    }, 50);
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+        }
+
+        // Display rating description
+        if (this.ratingDescription) {
+            this.ratingDescription.textContent = result.ratingDescription;
+        }
+
+        // Display summary text
+        if (this.summaryText) {
+            this.summaryText.textContent = result.summary;
+        }
+    }
+
+    showError(message) {
+        if (this.summaryLoading) this.summaryLoading.style.display = 'none';
+        if (this.summaryContent) this.summaryContent.style.display = 'none';
+        if (this.summaryError) {
+            this.summaryError.style.display = 'block';
+            const errorP = this.summaryError.querySelector('p');
+            if (errorP) {
+                errorP.textContent = message || 'Failed to generate summary. Please try again.';
+            }
+        }
+    }
+
+    hide() {
+        if (this.modal) {
+            this.modal.style.display = 'none';
+
+            // Reset the modal state
+            if (this.starRating) {
+                const stars = this.starRating.querySelectorAll('.star');
+                stars.forEach(star => star.classList.remove('filled'));
+            }
+        }
     }
 }
 

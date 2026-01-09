@@ -19,6 +19,12 @@
             <div class="avatar-video" id="avatarVideo" style="display: none;"></div>
         </div>
 
+        <!-- User Camera Preview (Top Left) -->
+        <div class="user-camera-preview" id="userCameraPreview" style="display: none;">
+            <div class="camera-video" id="userCameraVideo"></div>
+            <div class="camera-label" data-i18n="you">You</div>
+        </div>
+
         <!-- Top Status Bar -->
         <div class="status-overlay">
             <div class="status-left">
@@ -191,6 +197,49 @@ data-i18n="messagePlaceholder"
                             <span class="name">中文</span>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conversation Summary Modal -->
+        <div class="modal-overlay" id="summaryModal" style="display: none;">
+            <div class="modal summary-modal">
+                <div class="modal-header">
+                    <h2 data-i18n="conversationSummary">Conversation Summary</h2>
+                    <button class="btn-close" id="closeSummaryBtn">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="summary-loading" id="summaryLoading" style="display: none;">
+                        <div class="loader"></div>
+                        <p data-i18n="analyzingConversation">Analyzing your conversation...</p>
+                    </div>
+                    <div class="summary-content" id="summaryContent" style="display: none;">
+                        <div class="rating-section">
+                            <div class="rating-label" data-i18n="yourRating">Your Conversation Rating</div>
+                            <div class="star-rating" id="starRating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <div class="rating-description" id="ratingDescription">
+                                Average - Decent conversation, polite but basic interaction
+                            </div>
+                        </div>
+                        <div class="summary-section">
+                            <div class="summary-label" data-i18n="summary">Summary</div>
+                            <div class="summary-text" id="summaryText">
+                                Your conversation summary will appear here...
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-error" id="summaryError" style="display: none;">
+                        <p>Failed to generate summary. Please try again.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="closeSummaryDoneBtn" data-i18n="done">Done</button>
                 </div>
             </div>
         </div>
