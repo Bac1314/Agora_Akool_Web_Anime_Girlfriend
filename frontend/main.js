@@ -146,23 +146,36 @@ class App {
             panel: document.getElementById('debugInfo'),
             channel: document.getElementById('debugChannel'),
             user: document.getElementById('debugUser'),
-            agent: document.getElementById('debugAgent')
+            agent: document.getElementById('debugAgent'),
+            isVisible: false
         };
-        
+
+        // Ensure debug info is hidden by default
+        if (this.debugInfo.panel) {
+            this.debugInfo.panel.style.display = 'none';
+        }
+
         // Show debug info on Ctrl+Shift+D
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.shiftKey && e.key === 'D') {
                 this.toggleDebugInfo();
             }
         });
-        
+
+        // Wire up debug button
+        const debugBtn = document.getElementById('debugBtn');
+        if (debugBtn) {
+            debugBtn.addEventListener('click', () => this.toggleDebugInfo());
+        }
+
         this.updateDebugInfo();
     }
     
     toggleDebugInfo() {
         if (this.debugInfo.panel) {
-            const isVisible = this.debugInfo.panel.style.display !== 'none';
-            this.debugInfo.panel.style.display = isVisible ? 'none' : 'block';
+            this.debugInfo.isVisible = !this.debugInfo.isVisible;
+            this.debugInfo.panel.style.display = this.debugInfo.isVisible ? 'block' : 'none';
+            UTILS.showToast(`Debug info ${this.debugInfo.isVisible ? 'shown' : 'hidden'}`, 'info');
         }
     }
     

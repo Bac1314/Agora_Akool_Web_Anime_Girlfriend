@@ -64,19 +64,13 @@ class ControlsManager {
                     this.updateControlStates();
                     window.chatManager.enableChat();
                     
-                    // Update and show debug info
+                    // Update debug info (but don't auto-show)
                     if (window.app && window.app.updateDebugInfo) {
                         window.app.updateDebugInfo({
                             channel: settings.channel,
                             user: settings.userName,
                             agentId: result.agentId || 'N/A'
                         });
-                        // Show debug info automatically after connection
-                        setTimeout(() => {
-                            if (window.app.debugInfo && window.app.debugInfo.panel) {
-                                window.app.debugInfo.panel.style.display = 'block';
-                            }
-                        }, 1000);
                     }
                     
                     window.chatManager.sendMessage(
@@ -98,11 +92,6 @@ class ControlsManager {
                 this.isVideoMuted = false;
                 this.updateControlStates();
                 window.chatManager.disableChat();
-
-                // Hide debug info on disconnect
-                if (window.app && window.app.debugInfo && window.app.debugInfo.panel) {
-                    window.app.debugInfo.panel.style.display = 'none';
-                }
 
                 // Small delay to show disconnection loading
                 setTimeout(() => {
@@ -452,6 +441,11 @@ class SummaryModal {
             if (this.starRating) {
                 const stars = this.starRating.querySelectorAll('.star');
                 stars.forEach(star => star.classList.remove('filled'));
+            }
+
+            // Clear chat history after summary is dismissed
+            if (window.chatManager) {
+                window.chatManager.clearMessages();
             }
         }
     }
