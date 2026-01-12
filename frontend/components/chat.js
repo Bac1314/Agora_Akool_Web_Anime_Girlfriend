@@ -41,7 +41,9 @@ class ChatManager {
             this.chatToggle?.addEventListener('click', this.handleToggleChat);
             this.closeChatButton?.addEventListener('click', this.handleCloseChat);
 
-            this.loadMessageHistory();
+            // Chat history disabled - each session starts fresh
+            // Clear any existing history from localStorage
+            STORAGE.remove('chatHistory');
             console.log('Chat manager initialized');
             return true;
 
@@ -108,7 +110,7 @@ class ChatManager {
 
         this.messages.push(message);
         this.displayMessage(message);
-        this.saveMessageHistory();
+        // this.saveMessageHistory(); // Disabled - history not saved
         this.scrollToBottom();
 
         console.log('Message sent:', message);
@@ -169,7 +171,7 @@ class ChatManager {
             };
             this.messages.push(message);
             this.displayMessage(message);
-            this.saveMessageHistory();
+            // this.saveMessageHistory(); // Disabled - history not saved
             this.scrollToBottom();
         }
     }
@@ -184,7 +186,7 @@ class ChatManager {
                 contentP.textContent = message.content;
             }
         }
-        this.saveMessageHistory();
+        // this.saveMessageHistory(); // Disabled - history not saved
         this.scrollToBottom();
     }
 
@@ -229,7 +231,7 @@ class ChatManager {
                 </div>
             `;
         }
-        this.saveMessageHistory();
+        // this.saveMessageHistory(); // Disabled - history not saved
         console.log('Chat cleared');
     }
 
