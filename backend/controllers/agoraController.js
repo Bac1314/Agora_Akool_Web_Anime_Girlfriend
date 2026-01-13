@@ -76,12 +76,22 @@ const startConversation = async (req, res) => {
           input_modalities: ["text", "image"],
           output_modalities: ["text"]
         },
-        tts: {
-          vendor: "microsoft",
+        // tts: {
+        //   vendor: "microsoft",
+        //   params: {
+        //     key: process.env.TTS_Microsoft_API_KEY,
+        //     region: process.env.TTS_Microsoft_REGION,
+        //     voice_name: process.env.TTS_Microsoft_VOICE || "en-US-AriaNeural",
+        //   }
+        // },
+            tts: {
+          vendor: "elevenlabs",
           params: {
-            key: process.env.TTS_Microsoft_API_KEY,
-            region: process.env.TTS_Microsoft_REGION,
-            voice_name: process.env.TTS_Microsoft_VOICE || "en-US-AriaNeural",
+            key: process.env.TTS_ElevenLabs_API_KEY,
+            base_url: process.env.TTS_ElevenLabs_BASE_URL,
+            voice_id: process.env.TTS_ElevenLabs_VOICE_ID,
+            model_id: process.env.TTS_ElevenLabs_MODEL_ID, 
+            sample_rate: 16000
           }
         },
         avatar: {
