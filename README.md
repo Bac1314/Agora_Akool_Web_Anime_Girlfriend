@@ -15,6 +15,7 @@ A modern web-based AI anime girlfriend application featuring full-screen immersi
 - **📱 Mobile-First Design**: Optimized for mobile devices with touch-friendly controls
 - **⚙️ Customizable AI Models**: Configure your own LLM, ASR, and TTS services
 - **🔒 Secure Architecture**: API keys safely stored on backend
+- **🔐 HTTP Basic Authentication**: Optional password protection for production deployments
 - **🎨 Modern UI/UX**: Glass-morphism effects, backdrop blur, and smooth animations
 - **💫 Streaming Responses**: AI responses stream word-by-word for natural conversation flow
 
@@ -146,6 +147,8 @@ Manages user controls:
 │   │   ├── agoraController.js      # ConvoAI lifecycle
 │   │   ├── avatarController.js     # Akool avatar config
 │   │   └── aiSummaryController.js  # Conversation summaries
+│   ├── middleware/        # Express middleware
+│   │   └── auth.js        # HTTP Basic Authentication
 │   ├── routes/           # Express route definitions
 │   │   ├── agora_routes.js
 │   │   ├── avatar_routes.js
@@ -222,6 +225,8 @@ Configure via environment variables (see `.env.example`)
 | `TTS_Microsoft_API_KEY` | Azure TTS API key | ✅ Yes |
 | `TTS_Microsoft_REGION` | Azure region | ✅ Yes |
 | `TTS_Microsoft_VOICE` | Voice name | ✅ Yes |
+| `AUTH_USERNAME` | HTTP Basic Auth username | ❌ Optional |
+| `AUTH_PASSWORD` | HTTP Basic Auth password | ❌ Optional |
 | `PORT` | Server port (default: 3000) | ❌ Optional |
 
 ## 🎮 Usage Guide
@@ -399,6 +404,102 @@ The application uses Agora RTM to receive conversation transcriptions:
 }
 ```
 
+## 🚢 Deployment
+
+### Deploying to Render
+
+This application can be easily deployed to [Render](https://render.com) with the following steps:
+
+#### 1. Prepare Your Repository
+Ensure your code is pushed to a Git repository (GitHub, GitLab, or Bitbucket).
+
+#### 2. Create a New Web Service
+1. Log in to your [Render Dashboard](https://dashboard.render.com/)
+2. Click **"New +"** and select **"Web Service"**
+3. Connect your Git repository
+4. Configure the service:
+   - **Name**: `ai-anime-girlfriend` (or your preferred name)
+   - **Environment**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Instance Type**: Choose based on expected traffic (Free tier works for testing)
+
+#### 3. Configure Environment Variables
+In the Render dashboard, add all required environment variables from your `.env` file:
+
+**Required Variables:**
+```
+AGORA_APP_ID=your_agora_app_id
+AGORA_API_KEY=your_agora_api_key
+AGORA_API_SECRET=your_agora_api_secret
+AKOOL_API_KEY=your_akool_api_key
+AKOOL_AVATAR_ID=your_avatar_id
+LLM_URL=https://api.openai.com/v1/chat/completions
+LLM_API_KEY=your_llm_api_key
+LLM_MODEL=gpt-4o-mini
+LLM_SYSTEM_PROMPT=You are a friendly AI anime girlfriend...
+TTS_Microsoft_API_KEY=your_tts_api_key
+TTS_Microsoft_REGION=eastus
+TTS_Microsoft_VOICE=en-US-AriaNeural
+```
+
+**Authentication (Recommended for Production):**
+```
+AUTH_USERNAME=your_chosen_username
+AUTH_PASSWORD=your_secure_password
+```
+
+> **Security Note**: Setting `AUTH_USERNAME` and `AUTH_PASSWORD` will enable HTTP Basic Authentication, preventing unauthorized access to your application. Users will be prompted for credentials when accessing the site.
+
+#### 4. Deploy
+1. Click **"Create Web Service"**
+2. Render will automatically build and deploy your application
+3. Once deployed, you'll receive a URL like `https://your-app-name.onrender.com`
+
+#### 5. Test Your Deployment
+1. Visit your deployed URL
+2. If authentication is enabled, you'll see a browser login prompt
+3. Enter your `AUTH_USERNAME` and `AUTH_PASSWORD`
+4. Test the application by starting a conversation
+
+### Authentication
+
+The application includes optional HTTP Basic Authentication to protect against misuse:
+
+**How It Works:**
+- When `AUTH_USERNAME` and `AUTH_PASSWORD` are set, all routes (except `/health`) require authentication
+- Users see a browser-native login popup when accessing the site
+- The browser remembers credentials during the session
+- The `/health` endpoint remains public for monitoring purposes
+
+**Enable Authentication:**
+```bash
+# In your .env file or Render environment variables
+AUTH_USERNAME=demo
+AUTH_PASSWORD=your_secure_password_here
+```
+
+**Disable Authentication:**
+```bash
+# Leave blank or remove these variables
+AUTH_USERNAME=
+AUTH_PASSWORD=
+```
+
+**Best Practices:**
+- Use strong passwords for production deployments
+- Consider using a password manager to generate credentials
+- Share credentials only with authorized users
+- Change passwords regularly for shared deployments
+
+### Other Deployment Platforms
+
+The application can also be deployed to:
+- **Heroku**: Use the same environment variables and start command
+- **Railway**: Similar configuration to Render
+- **DigitalOcean App Platform**: Configure as a Node.js app
+- **AWS/Azure/GCP**: Deploy as a containerized application or directly on a VM
+
 ## 🔗 External Resources
 
 ### Documentation
@@ -421,13 +522,22 @@ The application uses Agora RTM to receive conversation transcriptions:
 
 - ✅ API keys stored securely on backend
 - ✅ No credentials exposed to frontend
+- ✅ Optional HTTP Basic Authentication for access control
 - ✅ CORS properly configured
 - ✅ Input validation on all endpoints
 - ✅ Environment-specific configurations
 - ✅ Secure token generation (when enabled)
 - ✅ RTM messages properly filtered by channel
+- ✅ Health endpoint remains public for monitoring
 
 ## 🚀 Recent Updates
+
+### v2.2 - HTTP Basic Authentication (January 15, 2026)
+- 🔐 Added optional HTTP Basic Authentication for production deployments
+- 🛡️ Browser-native login popup to prevent unauthorized access
+- 📝 Comprehensive deployment guide for Render and other platforms
+- ⚙️ Flexible authentication (disabled by default for local development)
+- 🏥 Public health endpoint for monitoring services
 
 ### v2.1 - Conversation Summary & Rating (January 9, 2026)
 - ⭐ AI-powered conversation analysis after each session
