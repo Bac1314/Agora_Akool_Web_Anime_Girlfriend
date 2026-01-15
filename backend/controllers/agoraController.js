@@ -76,15 +76,7 @@ const startConversation = async (req, res) => {
           input_modalities: ["text", "image"],
           output_modalities: ["text"]
         },
-        // tts: {
-        //   vendor: "microsoft",
-        //   params: {
-        //     key: process.env.TTS_Microsoft_API_KEY,
-        //     region: process.env.TTS_Microsoft_REGION,
-        //     voice_name: process.env.TTS_Microsoft_VOICE || "en-US-AriaNeural",
-        //   }
-        // },
-            tts: {
+        tts: {
           vendor: "elevenlabs",
           params: {
             key: process.env.TTS_ElevenLabs_API_KEY,
@@ -179,7 +171,7 @@ const stopConversation = async (req, res) => {
       }
     );
 
-    res.json({ success: true, message: 'Conversation stopped' });
+    res.json({ success: true, message: 'Conversation stopped ' + response.data.message });
 
   } catch (error) {
     console.error('Stop conversation error:', error.response?.data || error.message);

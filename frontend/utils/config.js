@@ -89,27 +89,13 @@ const STORAGE = {
 };
 
 const UTILS = {
-    generateUID: () => Math.floor(Math.random() * 100000) + 1000,
-    
-    generateChannelName: () => `anime-gf-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    generateChannelName: () => `anime-gf-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
     
     formatTime: (date = new Date()) => {
         return date.toLocaleTimeString([], { 
             hour: '2-digit', 
             minute: '2-digit' 
         });
-    },
-
-    debounce: (func, wait) => {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
     },
 
     showToast: (message, type = 'info') => {

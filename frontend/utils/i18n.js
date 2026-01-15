@@ -312,14 +312,6 @@ class I18nManager {
         });
     }
 
-    // Format text with variables
-    tf(key, variables = {}) {
-        let text = this.t(key);
-        Object.keys(variables).forEach(varKey => {
-            text = text.replace(new RegExp(`{${varKey}}`, 'g'), variables[varKey]);
-        });
-        return text;
-    }
 }
 
 // Create global i18n instance

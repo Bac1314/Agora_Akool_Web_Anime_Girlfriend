@@ -168,6 +168,12 @@ class App {
             debugBtn.addEventListener('click', () => this.toggleDebugInfo());
         }
 
+        // Wire up copy debug button
+        const copyDebugBtn = document.getElementById('copyDebugBtn');
+        if (copyDebugBtn) {
+            copyDebugBtn.addEventListener('click', () => this.copyDebugInfo());
+        }
+
         this.updateDebugInfo();
     }
     
@@ -190,6 +196,53 @@ class App {
         }
         if (data.agentId && this.debugInfo.agent) {
             this.debugInfo.agent.textContent = data.agentId;
+        }
+    }
+    
+    async copyDebugInfo() {
+        if (!this.debugInfo) return;
+        
+        try {
+            // Get current debug values
+            const channel = this.debugInfo.channel?.textContent || '-';
+            const user = this.debugInfo.user?.textContent || '-';
+            const agent = this.debugInfo.agent?.textContent || '-';
+            
+            // Get additional app status info
+            const status = this.getStatus();
+            const timestamp = new Date().toISOString();
+            
+            // Create formatted debug text
+            const debugText = `AI Anime Girlfriend - Debug Information
+==============================================
+Timestamp: ${timestamp}
+
+Connection Info:
+- Channel: ${channel}
+- User: ${user}  
+- Agent: ${agent}
+
+==============================================`;
+
+            // Copy to clipboard
+            await navigator.clipboard.writeText(debugText);
+            
+            // Show success feedback
+            UTILS.showToast('Debug info copied to clipboard!', 'success');
+            
+            // Temporarily change button icon to show success
+            const copyBtn = document.getElementById('copyDebugBtn');
+            if (copyBtn) {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✓';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 1000);
+            }
+            
+        } catch (error) {
+            console.error('Failed to copy debug info:', error);
+            UTILS.showToast('Failed to copy debug info', 'error');
         }
     }
 }
