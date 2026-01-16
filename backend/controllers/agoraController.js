@@ -86,6 +86,15 @@ const startConversation = async (req, res) => {
             sample_rate: 16000
           }
         },
+        // tts: { 
+        //   vendor: "microsoft",
+        //   params: {
+        //     key: process.env.TTS_Microsoft_API_KEY,
+        //     region: process.env.TTS_Microsoft_REGION,
+        //     voice_name: process.env.TTS_Microsoft_VOICE, 
+        //     sample_rate: 16000
+        //   }
+        // },
         avatar: {
           vendor: "akool",
           enable: true,
