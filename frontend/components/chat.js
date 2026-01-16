@@ -173,6 +173,11 @@ class ChatManager {
             this.displayMessage(message);
             // this.saveMessageHistory(); // Disabled - history not saved
             this.scrollToBottom();
+
+            // Auto-open chat panel when AI responds (if not already open)
+            if (!this.isOpen) {
+                this.openChat();
+            }
         }
     }
 
@@ -244,14 +249,29 @@ class ChatManager {
     }
 
     enableChat() {
+        // Show chat overlay
+        const chatOverlay = document.getElementById('chatOverlay');
+        if (chatOverlay) {
+            chatOverlay.classList.add('visible');
+        }
+
         if (this.messageInput && this.sendButton) {
             this.messageInput.disabled = false;
             this.sendButton.disabled = false;
-            this.messageInput.placeholder = "Type your message here...";
+            this.messageInput.placeholder = window.i18n ? window.i18n.t('messagePlaceholder') : "Type your message... ♪";
         }
     }
 
     disableChat() {
+        // Hide chat overlay
+        const chatOverlay = document.getElementById('chatOverlay');
+        if (chatOverlay) {
+            chatOverlay.classList.remove('visible');
+        }
+
+        // Close chat panel if open
+        this.closeChat();
+
         if (this.messageInput && this.sendButton) {
             this.messageInput.disabled = true;
             this.sendButton.disabled = true;

@@ -168,11 +168,17 @@ class App {
             debugBtn.addEventListener('click', () => this.toggleDebugInfo());
         }
 
-        // Wire up copy debug button
+        // Wire up copy debug button (copy all)
         const copyDebugBtn = document.getElementById('copyDebugBtn');
         if (copyDebugBtn) {
             copyDebugBtn.addEventListener('click', () => this.copyDebugInfo());
         }
+
+        // Wire up individual copy functionality for each debug value
+        const copyableValues = document.querySelectorAll('.debug-value.copyable');
+        copyableValues.forEach(element => {
+            element.addEventListener('click', (e) => this.copyIndividualDebugValue(e.target));
+        });
 
         this.updateDebugInfo();
     }
@@ -201,48 +207,87 @@ class App {
     
     async copyDebugInfo() {
         if (!this.debugInfo) return;
-        
+
         try {
             // Get current debug values
             const channel = this.debugInfo.channel?.textContent || '-';
             const user = this.debugInfo.user?.textContent || '-';
             const agent = this.debugInfo.agent?.textContent || '-';
-            
+
             // Get additional app status info
             const status = this.getStatus();
             const timestamp = new Date().toISOString();
-            
+
             // Create formatted debug text
             const debugText = `AI Anime Girlfriend - Debug Information
-==============================================
 Timestamp: ${timestamp}
 
 Connection Info:
 - Channel: ${channel}
-- User: ${user}  
+- User: ${user}
 - Agent: ${agent}
-
-==============================================`;
+`;
 
             // Copy to clipboard
             await navigator.clipboard.writeText(debugText);
-            
+
             // Show success feedback
-            UTILS.showToast('Debug info copied to clipboard!', 'success');
-            
-            // Temporarily change button icon to show success
+            UTILS.showToast('All debug info copied!', 'success');
+
+            // Temporarily change button to show success
             const copyBtn = document.getElementById('copyDebugBtn');
             if (copyBtn) {
-                const originalText = copyBtn.textContent;
-                copyBtn.textContent = '✓';
-                setTimeout(() => {
-                    copyBtn.textContent = originalText;
-                }, 1000);
+                const icon = copyBtn.querySelector('.copy-icon');
+                const label = copyBtn.querySelector('.copy-label');
+                if (icon && label) {
+                    const originalIcon = icon.textContent;
+                    const originalLabel = label.textContent;
+                    icon.textContent = '✓';
+                    label.textContent = 'Copied!';
+                    setTimeout(() => {
+                        icon.textContent = originalIcon;
+                        label.textContent = originalLabel;
+                    }, 1500);
+                }
             }
-            
+
         } catch (error) {
             console.error('Failed to copy debug info:', error);
             UTILS.showToast('Failed to copy debug info', 'error');
+        }
+    }
+
+    async copyIndividualDebugValue(element) {
+        if (!element) return;
+
+        try {
+            const value = element.textContent.trim();
+            const type = element.dataset.copyType || 'value';
+
+            // Don't copy if value is empty or placeholder
+            if (value === '-' || value === '') {
+                UTILS.showToast('No value to copy', 'info');
+                return;
+            }
+
+            // Copy to clipboard
+            await navigator.clipboard.writeText(value);
+
+            // Show success feedback
+            const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
+            UTILS.showToast(`${typeLabel} copied!`, 'success');
+
+            // Visual feedback - briefly highlight the element
+            element.style.background = 'rgba(79, 195, 247, 0.3)';
+            element.style.color = '#4fc3f7';
+            setTimeout(() => {
+                element.style.background = '';
+                element.style.color = '';
+            }, 300);
+
+        } catch (error) {
+            console.error('Failed to copy debug value:', error);
+            UTILS.showToast('Failed to copy', 'error');
         }
     }
 }

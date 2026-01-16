@@ -1,6 +1,5 @@
 const CONFIG = {
     API_BASE_URL: window.location.origin,
-    DEFAULT_CHANNEL: 'anime-girlfriend-demo',
     DEFAULT_USER_NAME: 'User',
     AGORA_SETTINGS: {
         codec: 'vp8',

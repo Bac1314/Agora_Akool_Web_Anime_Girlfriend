@@ -155,6 +155,9 @@ class AgoraManager {
             this.currentChannel = channel;
             this.currentUID = userUID;
 
+            // Update placeholder to show waiting for avatar
+            this.updateAvatarPlaceholder('connecting');
+
             // Initialize RTM for messaging
             await this.initializeRTM(channelInfo.appId, channel, userUID);
 
@@ -250,6 +253,9 @@ class AgoraManager {
             this.updateAvatarStatus('offline');
             this.hideAvatar();
             this.hideUserCamera();
+
+            // Reset placeholder to idle state
+            this.updateAvatarPlaceholder('idle');
 
             console.log('Conversation stopped successfully');
             return true;
@@ -472,6 +478,26 @@ class AgoraManager {
     }
 
     /**
+     * Update avatar placeholder text
+     * @param {string} state - State: 'idle', 'connecting', or custom text
+     */
+    updateAvatarPlaceholder(state) {
+        const placeholder = document.getElementById('avatarPlaceholder');
+        if (!placeholder) return;
+
+        const placeholderText = placeholder.querySelector('p[data-i18n]');
+        if (!placeholderText) return;
+
+        if (state === 'idle') {
+            placeholderText.setAttribute('data-i18n', 'avatarLoading');
+            placeholderText.textContent = window.i18n ? window.i18n.t('avatarLoading') : "Click 'Start Call' to connect";
+        } else if (state === 'connecting') {
+            placeholderText.setAttribute('data-i18n', 'avatarConnecting');
+            placeholderText.textContent = window.i18n ? window.i18n.t('avatarConnecting') : 'Waiting for avatar...';
+        }
+    }
+
+    /**
      * Hide avatar video and show placeholder
      */
     hideAvatar() {
@@ -482,6 +508,13 @@ class AgoraManager {
             avatarContainer.style.display = 'none';
             placeholder.style.display = 'block';
             avatarContainer.innerHTML = '';
+
+            // Update placeholder text based on connection state
+            if (this.isConnected) {
+                this.updateAvatarPlaceholder('connecting');
+            } else {
+                this.updateAvatarPlaceholder('idle');
+            }
 
             console.log('Avatar video hidden');
         }

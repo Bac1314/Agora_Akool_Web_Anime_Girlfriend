@@ -28,7 +28,7 @@
         <!-- Top Status Bar -->
         <div class="status-overlay">
             <div class="status-left">
-<div class="app-title" data-i18n="title">Virtual Girlfriend</div>
+                <div class="app-title" data-i18n="title">Virtual Girlfriend</div>
             </div>
             <div class="status-right">
                 <div class="status-item" id="connectionStatus">
@@ -46,39 +46,40 @@
             </div>
         </div>
 
-        <!-- Chat Overlay (Bottom) -->
-        <div class="chat-overlay" id="chatOverlay">
-            <!-- Chat Toggle Button -->
-            <button class="chat-toggle" id="chatToggle">
-                <span class="chat-icon">💬</span>
-<span class="chat-text" data-i18n="chat">チャット</span>
-            </button>
-
-            <!-- Chat Panel -->
-            <div class="chat-panel" id="chatPanel">
-                <div class="chat-header">
-<div class="chat-title" data-i18n="chat">チャット</div>
-                    <div class="chat-actions">
-<button class="btn-mini" id="clearChatBtn" data-i18n="clear">クリア</button>
-                        <button class="btn-mini" id="closeChatBtn">×</button>
+        <!-- Control Bar with Chat (Bottom) -->
+        <div class="control-bar">
+            <!-- Chat Overlay -->
+            <div class="chat-overlay" id="chatOverlay">
+                <!-- Chat Messages Panel (Collapsible) -->
+                <div class="chat-panel" id="chatPanel">
+                    <div class="chat-header">
+                        <div class="chat-title" data-i18n="chat">チャット</div>
+                        <div class="chat-actions">
+                            <button class="btn-mini" id="clearChatBtn" data-i18n="clear">クリア</button>
+                            <button class="btn-mini" id="closeChatBtn">×</button>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message system">
-                        <div class="message-content">
-<p data-i18n="welcomeMessage">Hello! I'm your girlfriend ♪ How are you today?</p>
+
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message system">
+                            <div class="message-content">
+                                <p data-i18n="welcomeMessage">Hello! I'm your girlfriend ♪ How are you today?</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Chat Input (Always Visible) -->
                 <div class="chat-input-container">
                     <div class="input-group">
-                        <input 
-                            type="text" 
-                            id="messageInput" 
-data-i18n="messagePlaceholder"
-                            placeholder="Type your message... ♪" 
+                        <button class="chat-toggle" id="chatToggle" title="Show chat history">
+                            <span class="chat-icon">💬</span>
+                        </button>
+                        <input
+                            type="text"
+                            id="messageInput"
+                            data-i18n="messagePlaceholder"
+                            placeholder="Type your message... ♪"
                             disabled
                         >
                         <button class="btn-send" id="sendBtn" disabled>
@@ -86,7 +87,7 @@ data-i18n="messagePlaceholder"
                         </button>
                     </div>
                     <div class="typing-indicator" id="typingIndicator" style="display: none;">
-<span data-i18n="responding">She is thinking of a response...</span>
+                        <span data-i18n="responding">She is thinking of a response...</span>
                         <div class="typing-dots">
                             <span></span>
                             <span></span>
@@ -95,28 +96,28 @@ data-i18n="messagePlaceholder"
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Control Bar (Bottom Center) -->
-        <div class="control-bar">
-            <button class="btn-control btn-call" id="callBtn" data-state="start">
-                <div class="control-icon" id="callIcon">
-                    <img src="/src/assets/call.svg" alt="Start Call" class="icon-svg" id="callIconImg">
-                </div>
-                <div class="control-text" id="callText" data-i18n="startCall">Start Call</div>
-            </button>
-            <button class="btn-control btn-mute" id="muteBtn" disabled>
-                <div class="control-icon" id="muteIcon">
-                    <img src="/src/assets/microphone.svg" alt="Mute Audio" class="icon-svg">
-                    <div class="mute-overlay" id="muteOverlay" style="display: none;"></div>
-                </div>
-            </button>
-            <button class="btn-control btn-video-mute" id="videoMuteBtn" disabled>
-                <div class="control-icon" id="videoMuteIcon">
-                    <img src="/src/assets/webcam.svg" alt="Mute Video" class="icon-svg">
-                    <div class="mute-overlay" id="videoMuteOverlay" style="display: none;"></div>
-                </div>
-            </button>
+            <!-- Control Buttons -->
+            <div class="control-buttons">
+                <button class="btn-control btn-call" id="callBtn" data-state="start">
+                    <div class="control-icon" id="callIcon">
+                        <img src="/src/assets/call.svg" alt="Start Call" class="icon-svg" id="callIconImg">
+                    </div>
+                    <div class="control-text" id="callText" data-i18n="startCall">Start Call</div>
+                </button>
+                <button class="btn-control btn-mute" id="muteBtn" disabled>
+                    <div class="control-icon" id="muteIcon">
+                        <img src="/src/assets/microphone.svg" alt="Mute Audio" class="icon-svg">
+                        <div class="mute-overlay" id="muteOverlay" style="display: none;"></div>
+                    </div>
+                </button>
+                <button class="btn-control btn-video-mute" id="videoMuteBtn" disabled>
+                    <div class="control-icon" id="videoMuteIcon">
+                        <img src="/src/assets/webcam.svg" alt="Mute Video" class="icon-svg">
+                        <div class="mute-overlay" id="videoMuteOverlay" style="display: none;"></div>
+                    </div>
+                </button>
+            </div>
         </div>
 
         <!-- Settings Modal -->
@@ -252,19 +253,22 @@ data-i18n="messagePlaceholder"
     <div class="debug-info" id="debugInfo" style="display: none;">
         <div class="debug-header">
             <span class="debug-title">Debug Information</span>
-            <button class="btn-copy-debug" id="copyDebugBtn" title="Copy debug info to clipboard">📋</button>
+            <button class="btn-copy-debug" id="copyDebugBtn" title="Copy all debug info to clipboard">
+                <span class="copy-icon">📋</span>
+                <span class="copy-label">Copy All</span>
+            </button>
         </div>
         <div class="debug-item">
             <span class="debug-label">Channel:</span>
-            <span class="debug-value" id="debugChannel">-</span>
+            <span class="debug-value copyable" id="debugChannel" data-copy-type="channel" title="Click to copy">-</span>
         </div>
         <div class="debug-item">
             <span class="debug-label">User:</span>
-            <span class="debug-value" id="debugUser">-</span>
+            <span class="debug-value copyable" id="debugUser" data-copy-type="user" title="Click to copy">-</span>
         </div>
         <div class="debug-item">
             <span class="debug-label">Agent:</span>
-            <span class="debug-value" id="debugAgent">-</span>
+            <span class="debug-value copyable" id="debugAgent" data-copy-type="agent" title="Click to copy">-</span>
         </div>
     </div>
 

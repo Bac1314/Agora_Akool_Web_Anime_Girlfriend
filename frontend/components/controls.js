@@ -8,7 +8,7 @@ class ControlsManager {
         this.isMuted = false;
         this.isVideoMuted = false;
         this.isStarted = false;
-        
+
         this.handleCall = this.handleCall.bind(this);
         this.handleMute = this.handleMute.bind(this);
         this.handleVideoMute = this.handleVideoMute.bind(this);
@@ -63,7 +63,7 @@ class ControlsManager {
                     this.isStarted = true;
                     this.updateControlStates();
                     window.chatManager.enableChat();
-                    
+
                     // Update debug info (but don't auto-show)
                     if (window.app && window.app.updateDebugInfo) {
                         window.app.updateDebugInfo({
@@ -72,12 +72,12 @@ class ControlsManager {
                             agentId: result.agentId || 'N/A'
                         });
                     }
-                    
+
                     window.chatManager.sendMessage(
                         `Connected! Welcome ${settings.userName}. I'm ready to assist you.`,
                         'ai'
                     );
-                    
+
                     UTILS.showToast('Successfully connected to AI assistant!', 'success');
                 }
                 
@@ -278,7 +278,7 @@ class ControlsManager {
 
     getSettings() {
         return {
-            channel: STORAGE.get('channelName') || UTILS.generateChannelName(),
+            channel: UTILS.generateChannelName(),
             userName: STORAGE.get('userName', CONFIG.DEFAULT_USER_NAME),
             enableVoice: STORAGE.get('enableVoice', true),
             enableAvatar: STORAGE.get('enableAvatar', true)
@@ -485,18 +485,22 @@ class SettingsModal {
     }
 
     loadCurrentSettings() {
+        // Channel name is now auto-generated, so we don't load it from storage
+        // Instead, show a placeholder indicating it will be auto-generated
         if (this.channelInput) {
-            this.channelInput.value = STORAGE.get('channelName') || UTILS.generateChannelName();
+            this.channelInput.value = '';
+            this.channelInput.placeholder = 'Auto-generated for each call';
+            this.channelInput.disabled = true;
         }
-        
+
         if (this.userNameInput) {
             this.userNameInput.value = STORAGE.get('userName', CONFIG.DEFAULT_USER_NAME);
         }
-        
+
         if (this.enableVoiceCheckbox) {
             this.enableVoiceCheckbox.checked = STORAGE.get('enableVoice', true);
         }
-        
+
         if (this.enableAvatarCheckbox) {
             this.enableAvatarCheckbox.checked = STORAGE.get('enableAvatar', true);
         }
@@ -523,7 +527,6 @@ class SettingsModal {
     saveSettings() {
         try {
             const settings = {
-                channelName: this.channelInput?.value?.trim() || UTILS.generateChannelName(),
                 userName: this.userNameInput?.value?.trim() || CONFIG.DEFAULT_USER_NAME,
                 enableVoice: this.enableVoiceCheckbox?.checked ?? true,
                 enableAvatar: this.enableAvatarCheckbox?.checked ?? true
@@ -533,11 +536,14 @@ class SettingsModal {
                 STORAGE.set(key, value);
             });
 
+            // Remove any old channelName from storage to ensure fresh generation
+            STORAGE.remove('channelName');
+
             UTILS.showToast('Settings saved successfully!', 'success');
             this.hide();
-            
+
             console.log('Settings saved:', settings);
-            
+
         } catch (error) {
             console.error('Failed to save settings:', error);
             UTILS.showToast('Failed to save settings', 'error');

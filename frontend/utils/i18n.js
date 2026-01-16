@@ -24,9 +24,10 @@ class I18nManager {
                 connected: '接続済み',
                 disconnected: '切断',
                 calling: "'通話開始'をクリックして接続",
-                
+
                 // Avatar & Loading
                 avatarLoading: "'通話開始'をクリックして接続",
+                avatarConnecting: 'アバターに接続中...',
                 
                 // Chat
                 chat: 'チャット',
@@ -75,15 +76,16 @@ class I18nManager {
             },
             
             'en': {
-                // App Title & Status  
+                // App Title & Status
                 title: 'Virtual Girlfriend',
                 connecting: 'Connecting to your girlfriend...',
                 connected: 'Connected',
                 disconnected: 'Disconnected',
                 calling: "Click 'Start Call' to connect",
-                
+
                 // Avatar & Loading
                 avatarLoading: "Click 'Start Call' to connect",
+                avatarConnecting: 'Waiting for avatar...',
                 
                 // Chat
                 chat: 'Chat',
@@ -138,9 +140,10 @@ class I18nManager {
                 connected: '연결됨',
                 disconnected: '연결 끊김',
                 calling: "'통화 시작'을 클릭하여 연결",
-                
+
                 // Avatar & Loading
                 avatarLoading: "'통화 시작'을 클릭하여 연결",
+                avatarConnecting: '아바타를 기다리는 중...',
                 
                 // Chat
                 chat: '채팅',
@@ -195,9 +198,10 @@ class I18nManager {
                 connected: '已连接',
                 disconnected: '已断开',
                 calling: "点击'开始通话'连接",
-                
+
                 // Avatar & Loading
                 avatarLoading: "点击'开始通话'连接",
+                avatarConnecting: '正在等待头像...',
                 
                 // Chat
                 chat: '聊天',
