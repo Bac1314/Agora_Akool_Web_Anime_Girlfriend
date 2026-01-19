@@ -195,20 +195,20 @@ The application uses a cascaded architecture where you can configure each compon
 
 #### ASR (Speech-to-Text)
 - **Agora Ares** (default): Built-in, no extra config needed
-- **Azure Speech**: Requires API key and region
-- **OpenAI Whisper**: Requires OpenAI API key
+- **Others**: Check Agora Documentation
 
 #### LLM (Language Model)
 - **OpenAI GPT-4o-mini** (default): Fast and cost-effective
 - **Azure OpenAI**: Enterprise-grade with SLA
 - **Anthropic Claude**: Advanced reasoning capabilities
+- **Others**: Check Agora Documentation
 
 Configure via environment variables (see `.env.example`)
 
 #### TTS (Text-to-Speech)
 - **Microsoft Azure TTS** (default): High-quality voices
-- **OpenAI TTS**: Natural-sounding speech
 - **ElevenLabs**: Premium voice quality
+- **Others**: Check Agora Documentation
 
 ### Environment Variables
 | Variable | Description | Required |
