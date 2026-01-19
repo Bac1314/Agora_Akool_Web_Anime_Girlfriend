@@ -18,6 +18,7 @@ class AgoraManager {
         // RTM Client for Messaging
         this.rtmClient = null;
         this.onMessageCallback = null;
+        this.onAgentStateCallback = null;
 
         // Connection State
         this.isConnected = false;
@@ -34,6 +35,7 @@ class AgoraManager {
         this.onUserPublished = this.onUserPublished.bind(this);
         this.onUserUnpublished = this.onUserUnpublished.bind(this);
         this.handleRtmMessage = this.handleRtmMessage.bind(this);
+        this.handlePresenceEvent = this.handlePresenceEvent.bind(this);
     }
 
     // ===========================
@@ -94,6 +96,10 @@ class AgoraManager {
             // Set up RTM message listener
             this.rtmClient.addEventListener('message', this.handleRtmMessage);
             console.log('RTM message listener added');
+
+            // Set up RTM presence listener for agent state updates
+            this.rtmClient.addEventListener('presence', this.handlePresenceEvent);
+            console.log('RTM presence listener added');
 
         } catch (error) {
             console.error('Failed to initialize RTM:', error);
@@ -161,11 +167,15 @@ class AgoraManager {
             // Initialize RTM for messaging
             await this.initializeRTM(channelInfo.appId, channel, userUID);
 
+            // Get system prompt from localStorage (per-user setting)
+            const systemPrompt = STORAGE.get('systemPrompt', null);
+
             // Start conversational AI agent
             const conversationData = await API.agora.startConversation({
                 channel: channel,
                 agentName: `agent_${userName}_${Date.now()}`,
-                remoteUid: userUID
+                remoteUid: userUID,
+                systemPrompt: systemPrompt // Send user's custom prompt if available
             });
 
             this.agentId = conversationData.agentId;
@@ -215,6 +225,7 @@ class AgoraManager {
                         await this.rtmClient.unsubscribe(this.currentChannel);
                     }
                     this.rtmClient.removeEventListener('message', this.handleRtmMessage);
+                    this.rtmClient.removeEventListener('presence', this.handlePresenceEvent);
                     await this.rtmClient.logout();
                     this.rtmClient = null;
                     console.log('RTM client cleaned up');
@@ -253,6 +264,7 @@ class AgoraManager {
             this.updateAvatarStatus('offline');
             this.hideAvatar();
             this.hideUserCamera();
+            this.hideAgentState();
 
             // Reset placeholder to idle state
             this.updateAvatarPlaceholder('idle');
@@ -373,6 +385,78 @@ class AgoraManager {
      */
     setMessageCallback(callback) {
         this.onMessageCallback = callback;
+    }
+
+    /**
+     * Handle RTM presence events
+     * Processes agent state updates from Agora Conversational AI
+     */
+    handlePresenceEvent(event) {
+        try {
+            console.log('RTM presence event received:', event);
+
+            // Check if this is a remote state change event from the agent
+            if (event.eventType === 'REMOTE_STATE_CHANGED') {
+                // Check if this is from a different user (not ourselves)
+                if (event.publisher !== this.currentUID?.toString()) {
+                    // Get the state from stateChanged object
+                    const stateChanged = event.stateChanged || {};
+
+                    if (stateChanged.state) {
+                        const agentState = stateChanged.state;
+                        console.log('Agent state changed to:', agentState);
+
+                        // Trigger callback if set
+                        if (this.onAgentStateCallback) {
+                            this.onAgentStateCallback(agentState);
+                        }
+
+                        // Update UI directly
+                        this.updateAgentStateUI(agentState);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error handling RTM presence event:', error);
+        }
+    }
+
+    /**
+     * Set callback function for agent state changes
+     * @param {Function} callback - Function to call when agent state changes
+     */
+    setAgentStateCallback(callback) {
+        this.onAgentStateCallback = callback;
+    }
+
+    /**
+     * Update UI to show agent state
+     * @param {string} state - Agent state (e.g., 'thinking', 'idle', 'speaking')
+     */
+    updateAgentStateUI(state) {
+        const agentStateElement = document.getElementById('agentState');
+        const agentStateText = document.getElementById('agentStateText');
+
+        if (agentStateElement && agentStateText) {
+            // Map agent states to user-friendly labels
+            const stateLabels = {
+                'thinking': 'Thinking...',
+                'idle': 'Idle',
+                'speaking': 'Speaking',
+                'listening': 'Listening',
+                'silent': 'Silent'
+            };
+
+            const displayText = stateLabels[state.toLowerCase()] || state;
+            agentStateText.textContent = displayText;
+
+            // Update state class for styling
+            agentStateElement.className = 'agent-state-indicator';
+            agentStateElement.classList.add(`state-${state.toLowerCase()}`);
+
+            // Show the indicator
+            agentStateElement.style.display = 'flex';
+        }
     }
 
     /**
@@ -574,6 +658,16 @@ class AgoraManager {
         if (statusElement && textElement) {
             statusElement.className = `status-dot ${status}`;
             textElement.textContent = status === 'online' ? 'Avatar Active' : 'Avatar Offline';
+        }
+    }
+
+    /**
+     * Hide agent state indicator
+     */
+    hideAgentState() {
+        const agentStateElement = document.getElementById('agentState');
+        if (agentStateElement) {
+            agentStateElement.style.display = 'none';
         }
     }
 

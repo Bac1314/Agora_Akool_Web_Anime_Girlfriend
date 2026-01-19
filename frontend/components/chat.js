@@ -174,10 +174,7 @@ class ChatManager {
             // this.saveMessageHistory(); // Disabled - history not saved
             this.scrollToBottom();
 
-            // Auto-open chat panel when AI responds (if not already open)
-            if (!this.isOpen) {
-                this.openChat();
-            }
+            // Don't auto-open chat panel - let user decide when to open it
         }
     }
 

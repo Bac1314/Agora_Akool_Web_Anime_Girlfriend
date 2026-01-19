@@ -46,6 +46,11 @@
             </div>
         </div>
 
+        <!-- Agent State Indicator (Top Center) -->
+        <div class="agent-state-indicator" id="agentState" style="display: none;">
+            <span class="agent-state-text" id="agentStateText">Idle</span>
+        </div>
+
         <!-- Control Bar with Chat (Bottom) -->
         <div class="control-bar">
             <!-- Chat Overlay -->
@@ -158,6 +163,14 @@
                             <option value="ko">🇰🇷 한국어</option>
                             <option value="zh">🇨🇳 中文</option>
                         </select>
+                    </div>
+                    <div class="setting-group">
+                        <label for="systemPrompt">AI System Prompt:</label>
+                        <textarea id="systemPrompt" rows="6" placeholder="Enter the AI's system prompt..."></textarea>
+                        <div class="setting-hint">
+                            <small>Customize how the AI behaves and responds. Changes will apply to new conversations.</small>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="resetPromptBtn" style="margin-top: 8px;">Reset to Default</button>
                     </div>
                 </div>
                 <div class="modal-footer">

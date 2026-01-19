@@ -21,7 +21,7 @@ const getChannelInfo = (req, res) => {
 
 const startConversation = async (req, res) => {
   try {
-    const { channel, agentName, remoteUid } = req.body;
+    const { channel, agentName, remoteUid, systemPrompt } = req.body;
     
     if (!channel || !agentName || !remoteUid) {
       return res.status(400).json({ 
@@ -46,6 +46,10 @@ const startConversation = async (req, res) => {
       });
     }
 
+    // Use provided system prompt or fall back to env variable or default
+    const defaultSystemPrompt = "You are a friendly AI anime girlfriend. Respond naturally in a caring, playful manner. Keep responses brief and conversational since this is voice-to-voice communication. Avoid long paragraphs and speak as if having a real conversation. Only output plain text responses, without any markdown, HTML tags, or emojis.";
+    const effectiveSystemPrompt = systemPrompt || process.env.LLM_SYSTEM_PROMPT || defaultSystemPrompt;
+
     const requestBody = {
       name: agentName,
       properties: {
@@ -65,7 +69,7 @@ const startConversation = async (req, res) => {
           system_messages: [
             {
               role: "system",
-              content: process.env.LLM_SYSTEM_PROMPT || "You are a friendly AI anime girlfriend. Respond naturally in a caring, playful manner. Keep responses brief and conversational since this is voice-to-voice communication. Avoid long paragraphs and speak as if having a real conversation. Only output plain text responses, without any markdown, HTML tags, or emojis."
+              content: effectiveSystemPrompt
             }
           ],
           greeting_message: "Hi there! I'm your AI anime girlfriend. How can I make your day better?",
@@ -114,6 +118,11 @@ const startConversation = async (req, res) => {
           data_channel: "rtm",
           transcript: {
             redundant: false
+          },
+          silence_config: { 
+            timeout_ms: 10000, // 10 seconds of silence detection
+            action: "think", // Agent will think/respond after silence
+            content: "User hasn't spoken for a while. Engage the user with a question or prompt."
           }
         }
       }

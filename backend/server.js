@@ -5,6 +5,7 @@ const path = require('path');
 const agoraRoutes = require('./routes/agora_routes');
 const avatarRoutes = require('./routes/avatar_routes');
 const aiSummaryRoutes = require('./routes/aiSummary_routes');
+const settingsRoutes = require('./routes/settings_routes');
 const basicAuth = require('./middleware/auth');
 
 const app = express();
@@ -34,6 +35,7 @@ app.use('/lib', express.static(path.join(__dirname, '../node_modules'), {
 app.use('/api/agora', agoraRoutes);
 app.use('/api/avatar', avatarRoutes);
 app.use('/api/ai-summary', aiSummaryRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));

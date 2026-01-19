@@ -458,16 +458,18 @@ class SettingsModal {
         this.userNameInput = null;
         this.enableVoiceCheckbox = null;
         this.enableAvatarCheckbox = null;
+        this.systemPromptTextarea = null;
+        this.resetPromptBtn = null;
     }
 
-    show() {
+    async show() {
         this.modal = document.getElementById('settingsModal');
         if (!this.modal) return;
 
         this.initializeElements();
-        this.loadCurrentSettings();
+        await this.loadCurrentSettings();
         this.attachEventListeners();
-        
+
         this.modal.style.display = 'flex';
     }
 
@@ -482,9 +484,11 @@ class SettingsModal {
         this.userNameInput = document.getElementById('userName');
         this.enableVoiceCheckbox = document.getElementById('enableVoice');
         this.enableAvatarCheckbox = document.getElementById('enableAvatar');
+        this.systemPromptTextarea = document.getElementById('systemPrompt');
+        this.resetPromptBtn = document.getElementById('resetPromptBtn');
     }
 
-    loadCurrentSettings() {
+    async loadCurrentSettings() {
         // Channel name is now auto-generated, so we don't load it from storage
         // Instead, show a placeholder indicating it will be auto-generated
         if (this.channelInput) {
@@ -504,6 +508,34 @@ class SettingsModal {
         if (this.enableAvatarCheckbox) {
             this.enableAvatarCheckbox.checked = STORAGE.get('enableAvatar', true);
         }
+
+        // Load system prompt from localStorage or fetch default from backend
+        if (this.systemPromptTextarea) {
+            const savedPrompt = STORAGE.get('systemPrompt', null);
+
+            if (savedPrompt) {
+                // Use saved prompt from localStorage
+                this.systemPromptTextarea.value = savedPrompt;
+            } else {
+                // Fetch default from backend and save to localStorage
+                try {
+                    const response = await fetch('/api/settings/system-prompt/default');
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.systemPromptTextarea.value = data.systemPrompt;
+                        this.systemPromptTextarea.placeholder = 'Using default system prompt...';
+                        // Save default to localStorage for future use
+                        STORAGE.set('systemPrompt', data.systemPrompt);
+                    } else {
+                        console.error('Failed to load default system prompt');
+                        this.systemPromptTextarea.placeholder = 'Failed to load default system prompt';
+                    }
+                } catch (error) {
+                    console.error('Error loading default system prompt:', error);
+                    this.systemPromptTextarea.placeholder = 'Error loading system prompt';
+                }
+            }
+        }
     }
 
     attachEventListeners() {
@@ -515,6 +547,10 @@ class SettingsModal {
         if (cancelBtn) cancelBtn.addEventListener('click', () => this.hide());
         if (saveBtn) saveBtn.addEventListener('click', () => this.saveSettings());
 
+        if (this.resetPromptBtn) {
+            this.resetPromptBtn.addEventListener('click', () => this.resetSystemPrompt());
+        }
+
         if (this.modal) {
             this.modal.addEventListener('click', (e) => {
                 if (e.target === this.modal) {
@@ -524,7 +560,7 @@ class SettingsModal {
         }
     }
 
-    saveSettings() {
+    async saveSettings() {
         try {
             const settings = {
                 userName: this.userNameInput?.value?.trim() || CONFIG.DEFAULT_USER_NAME,
@@ -539,6 +575,15 @@ class SettingsModal {
             // Remove any old channelName from storage to ensure fresh generation
             STORAGE.remove('channelName');
 
+            // Save system prompt to localStorage (per-user, persistent)
+            if (this.systemPromptTextarea) {
+                const systemPrompt = this.systemPromptTextarea.value.trim();
+                if (systemPrompt) {
+                    STORAGE.set('systemPrompt', systemPrompt);
+                    console.log('System prompt saved to localStorage');
+                }
+            }
+
             UTILS.showToast('Settings saved successfully!', 'success');
             this.hide();
 
@@ -547,6 +592,31 @@ class SettingsModal {
         } catch (error) {
             console.error('Failed to save settings:', error);
             UTILS.showToast('Failed to save settings', 'error');
+        }
+    }
+
+    async resetSystemPrompt() {
+        try {
+            // Fetch default from backend
+            const response = await fetch('/api/settings/system-prompt/default');
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch default system prompt');
+            }
+
+            const data = await response.json();
+
+            if (this.systemPromptTextarea) {
+                this.systemPromptTextarea.value = data.systemPrompt;
+            }
+
+            // Update localStorage with default
+            STORAGE.set('systemPrompt', data.systemPrompt);
+
+            UTILS.showToast('System prompt reset to default', 'success');
+        } catch (error) {
+            console.error('Failed to reset system prompt:', error);
+            UTILS.showToast('Failed to reset system prompt', 'error');
         }
     }
 }
