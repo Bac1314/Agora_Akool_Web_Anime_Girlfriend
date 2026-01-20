@@ -22,7 +22,15 @@ app.get('/health', (req, res) => {
 // Apply Basic Authentication to all routes below
 app.use(basicAuth);
 
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, '../frontend'), {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    } else if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+  }
+}));
 app.use('/src', express.static(path.join(__dirname, '../src')));
 app.use('/lib', express.static(path.join(__dirname, '../node_modules'), {
   setHeaders: (res, path) => {
