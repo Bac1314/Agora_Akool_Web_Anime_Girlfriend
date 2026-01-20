@@ -46,7 +46,21 @@ app.use('/api/ai-summary', aiSummaryRoutes);
 app.use('/api/settings', settingsRoutes);
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+  const indexPath = path.join(__dirname, '../frontend/index.html');
+  let html = require('fs').readFileSync(indexPath, 'utf8');
+  
+  // Inject authentication credentials into the HTML
+  const authScript = `
+    <script>
+      window.APP_AUTH_USERNAME = ${JSON.stringify(process.env.AUTH_USERNAME || '')};
+      window.APP_AUTH_PASSWORD = ${JSON.stringify(process.env.AUTH_PASSWORD || '')};
+    </script>
+  `;
+  
+  // Insert the auth script before the closing head tag
+  html = html.replace('</head>', `${authScript}</head>`);
+  
+  res.send(html);
 });
 
 app.listen(PORT, () => {

@@ -1,6 +1,10 @@
 const CONFIG = {
     API_BASE_URL: window.location.origin,
     DEFAULT_USER_NAME: 'User',
+    // Authentication credentials for API access
+    // These should be set via environment variables in your deployment
+    AUTH_USERNAME: window.APP_AUTH_USERNAME || '',
+    AUTH_PASSWORD: window.APP_AUTH_PASSWORD || '',
     AGORA_SETTINGS: {
         codec: 'vp8',
         mode: 'rtc',
@@ -15,11 +19,23 @@ const CONFIG = {
 const API = {
     async request(endpoint, options = {}) {
         const url = `${CONFIG.API_BASE_URL}/api${endpoint}`;
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers
+        };
+        
+        // Add Basic Auth header if credentials are available
+        // In production, these should be set in your deployment environment
+        const authUsername = CONFIG.AUTH_USERNAME || '';
+        const authPassword = CONFIG.AUTH_PASSWORD || '';
+        
+        if (authUsername && authPassword) {
+            const credentials = btoa(`${authUsername}:${authPassword}`);
+            headers['Authorization'] = `Basic ${credentials}`;
+        }
+        
         const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            },
+            headers,
             ...options
         };
 

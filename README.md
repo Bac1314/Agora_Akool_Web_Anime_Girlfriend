@@ -314,6 +314,12 @@ Access via the **Settings** button to customize:
 
 **Text messages not working:**
 - Ensure conversation is started (Call button shows "End Call")
+
+**API 404 errors on deployment (Render/Vercel/etc.):**
+- Set `AUTH_USERNAME` and `AUTH_PASSWORD` in your deployment environment variables
+- The app requires Basic Authentication when these variables are configured
+- Check deployment logs to ensure environment variables are loaded
+- For local testing without auth, leave `AUTH_USERNAME` and `AUTH_PASSWORD` empty
 - Check RTM client is initialized (console logs)
 - Verify no browser errors in console
 
