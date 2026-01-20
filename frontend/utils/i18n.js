@@ -1,7 +1,7 @@
 // Internationalization (i18n) system for multi-language support
 class I18nManager {
     constructor() {
-        this.currentLanguage = 'ja'; // Default to Japanese
+        this.currentLanguage = 'en'; // Default to English
         this.translations = {};
         this.loadTranslations();
         this.loadStoredLanguage();
