@@ -12,17 +12,17 @@ function getPersonalizedGreeting(userName, hasHistory) {
   
   if (hasHistory) {
     const greetings = [
-      `Hi ${name}! Good to see you again! 💕 How has your day been?`,
+      `Hi ${name}! Good to see you again! How has your day been?`,
       `Welcome back, ${name}! I've missed you! How can I brighten your day?`,
-      `${name}! You're back! I'm so happy to see you again! 😊`,
+      `${name}! You're back! I'm so happy to see you again!`,
       `Hey ${name}! Great to have you back! What's been on your mind?`
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
   } else {
     const greetings = [
       `Hi ${name}! I'm your AI companion. How can I make your day better?`,
-      `Hello ${name}! It's wonderful to meet you! I'm here to chat and help brighten your day! ✨`,
-      `Hey there, ${name}! I'm your AI girlfriend and I'm excited to get to know you! 💕`,
+      `Hello ${name}! It's wonderful to meet you! I'm here to chat and help brighten your day!`,
+      `Hey there, ${name}! I'm your AI girlfriend and I'm excited to get to know you!`,
       `Hi ${name}! Welcome! I'm here to be your companion. What would you like to talk about?`
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
