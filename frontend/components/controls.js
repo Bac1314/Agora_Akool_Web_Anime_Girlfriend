@@ -53,6 +53,14 @@ class ControlsManager {
     async handleCall() {
         try {
             if (!this.isStarted) {
+                // Check if user has set their name
+                const currentName = STORAGE.get('userName', '');
+                if (!currentName || currentName === 'User' || currentName.trim() === '') {
+                    // Show name prompt modal
+                    this.showNamePrompt();
+                    return;
+                }
+                
                 // Start call
                 this.showLoading(window.i18n.t('connectingToAI'));
                 
@@ -63,6 +71,9 @@ class ControlsManager {
                     this.isStarted = true;
                     this.updateControlStates();
                     window.chatManager.enableChat();
+                    
+                    // Start new chat session for AI summary tracking
+                    window.chatManager.startNewSession();
 
                     // Update debug info (but don't auto-show)
                     if (window.app && window.app.updateDebugInfo) {
@@ -74,7 +85,7 @@ class ControlsManager {
                     }
 
                     window.chatManager.sendMessage(
-                        `Connected! Welcome ${settings.userName}. I'm ready to assist you.`,
+                        `New Session Started`,
                         'ai'
                     );
 
@@ -86,6 +97,9 @@ class ControlsManager {
                 this.showLoading(window.i18n.t('disconnecting'));
 
                 await window.agoraManager.stopConversation();
+
+                // End chat session
+                window.chatManager.endSession();
 
                 this.isStarted = false;
                 this.isMuted = false;
@@ -276,6 +290,14 @@ class ControlsManager {
         }
     }
 
+    showNamePrompt() {
+        const namePrompt = new NamePromptModal();
+        namePrompt.show(() => {
+            // Callback when name is set - restart the call process
+            this.handleCall();
+        });
+    }
+
     getSettings() {
         return {
             channel: UTILS.generateChannelName(),
@@ -326,8 +348,8 @@ class SummaryModal {
         // Show loading state
         this.showLoading();
 
-        // Get conversation transcript from chat manager
-        const transcript = window.chatManager.messages.filter(msg =>
+        // Get current session transcript only (not persistent history)
+        const transcript = window.chatManager.getCurrentSessionMessages().filter(msg =>
             msg.sender === 'user' || msg.sender === 'ai'
         );
 
@@ -443,10 +465,10 @@ class SummaryModal {
                 stars.forEach(star => star.classList.remove('filled'));
             }
 
-            // Clear chat history after summary is dismissed
-            if (window.chatManager) {
-                window.chatManager.clearMessages();
-            }
+            // // Clear chat history after summary is dismissed
+            // if (window.chatManager) {
+            //     window.chatManager.clearMessages();
+            // }
         }
     }
 }
@@ -617,6 +639,113 @@ class SettingsModal {
         } catch (error) {
             console.error('Failed to reset system prompt:', error);
             UTILS.showToast('Failed to reset system prompt', 'error');
+        }
+    }
+
+    hide() {
+        if (this.modal) {
+            this.modal.style.display = 'none';
+        }
+    }
+}
+
+class NamePromptModal {
+    constructor() {
+        this.modal = null;
+        this.nameInput = null;
+        this.callback = null;
+    }
+
+    show(callback) {
+        this.callback = callback;
+        this.createModal();
+        this.modal.classList.remove('hidden');
+        
+        // Focus on input
+        setTimeout(() => {
+            if (this.nameInput) {
+                this.nameInput.focus();
+            }
+        }, 100);
+    }
+
+    createModal() {
+        // Remove existing modal if any
+        const existingModal = document.getElementById('namePromptModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Create modal HTML using CSS classes
+        const modalHtml = `
+            <div id="namePromptModal" class="name-prompt-modal hidden">
+                <div class="name-prompt-content">
+                    <h2 class="name-prompt-title">👋 What's your name?</h2>
+                    <p class="name-prompt-subtitle">Please tell me your name so I can give you a personalized experience!</p>
+                    
+                    <input type="text" id="namePromptInput" class="name-prompt-input" placeholder="Enter your name...">
+                    
+                    <div class="name-prompt-buttons">
+                        <button id="namePromptCancel" class="name-prompt-btn cancel">Cancel</button>
+                        <button id="namePromptConfirm" class="name-prompt-btn confirm">Continue</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add to body
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Get elements
+        this.modal = document.getElementById('namePromptModal');
+        this.nameInput = document.getElementById('namePromptInput');
+        const cancelBtn = document.getElementById('namePromptCancel');
+        const confirmBtn = document.getElementById('namePromptConfirm');
+
+        // Add event listeners
+        confirmBtn.addEventListener('click', () => this.saveName());
+        cancelBtn.addEventListener('click', () => this.hide());
+        
+        // Allow Enter key to confirm
+        this.nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.saveName();
+            }
+        });
+
+        // Prevent closing by clicking outside
+        this.modal.addEventListener('click', (e) => {
+            if (e.target === this.modal) {
+                // Don't close - name is required
+            }
+        });
+    }
+
+    saveName() {
+        const name = this.nameInput.value.trim();
+        if (name && name.length > 0) {
+            // Save name to storage
+            STORAGE.set('userName', name);
+            UTILS.showToast(`Welcome, ${name}! 💕`, 'success');
+            
+            this.hide();
+            
+            // Call the callback to continue with conversation start
+            if (this.callback) {
+                this.callback();
+            }
+        } else {
+            UTILS.showToast('Please enter your name to continue', 'error');
+            this.nameInput.focus();
+        }
+    }
+
+    hide() {
+        if (this.modal) {
+            this.modal.classList.add('hidden');
+            setTimeout(() => {
+                this.modal.remove();
+            }, 300);
         }
     }
 }

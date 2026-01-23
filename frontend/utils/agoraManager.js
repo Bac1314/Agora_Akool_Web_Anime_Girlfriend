@@ -169,13 +169,21 @@ class AgoraManager {
 
             // Get system prompt from localStorage (per-user setting)
             const systemPrompt = STORAGE.get('systemPrompt', null);
+            
+            // Get previous chat history for context (if any)
+            const chatHistory = window.chatManager ? window.chatManager.messages : [];
+            const previousConversations = chatHistory.filter(msg => 
+                msg.sender === 'user' || msg.sender === 'ai'
+            ).slice(-20); // Last 20 messages for context
 
             // Start conversational AI agent
             const conversationData = await API.agora.startConversation({
                 channel: channel,
                 agentName: `agent_${userName}_${Date.now()}`,
                 remoteUid: userUID,
-                systemPrompt: systemPrompt // Send user's custom prompt if available
+                userName: userName, // Add userName for personalized greeting
+                systemPrompt: systemPrompt, // Send user's custom prompt if available
+                previousConversations: previousConversations // Send chat history for context
             });
 
             this.agentId = conversationData.agentId;

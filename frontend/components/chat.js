@@ -1,6 +1,8 @@
 class ChatManager {
     constructor() {
-        this.messages = [];
+        this.messages = []; // All messages (persistent + current session)
+        this.currentSessionMessages = []; // Only current session messages for AI summary
+        this.sessionStartTime = null; // Track when current session started
         this.isTyping = false;
         this.messageContainer = null;
         this.messageInput = null;
@@ -41,9 +43,9 @@ class ChatManager {
             this.chatToggle?.addEventListener('click', this.handleToggleChat);
             this.closeChatButton?.addEventListener('click', this.handleCloseChat);
 
-            // Chat history disabled - each session starts fresh
-            // Clear any existing history from localStorage
-            STORAGE.remove('chatHistory');
+            // Load persistent chat history first, then display
+            this.loadPersistentHistory();
+            this.displayAllMessages();
             console.log('Chat manager initialized');
             return true;
 
@@ -109,8 +111,14 @@ class ChatManager {
         };
 
         this.messages.push(message);
+        
+        // Add to current session if session is active
+        if (this.sessionStartTime) {
+            this.currentSessionMessages.push(message);
+        }
+        
         this.displayMessage(message);
-        // this.saveMessageHistory(); // Disabled - history not saved
+        this.saveMessageHistory();
         this.scrollToBottom();
 
         console.log('Message sent:', message);
@@ -170,8 +178,14 @@ class ChatManager {
                 turnId: turnId
             };
             this.messages.push(message);
+            
+            // Add to current session if session is active
+            if (this.sessionStartTime) {
+                this.currentSessionMessages.push(message);
+            }
+            
             this.displayMessage(message);
-            // this.saveMessageHistory(); // Disabled - history not saved
+            this.saveMessageHistory();
             this.scrollToBottom();
 
             // Don't auto-open chat panel - let user decide when to open it
@@ -188,7 +202,7 @@ class ChatManager {
                 contentP.textContent = message.content;
             }
         }
-        // this.saveMessageHistory(); // Disabled - history not saved
+        this.saveMessageHistory();
         this.scrollToBottom();
     }
 
@@ -225,15 +239,9 @@ class ChatManager {
     clearMessages() {
         this.messages = [];
         if (this.messageContainer) {
-            this.messageContainer.innerHTML = `
-                <div class="message system">
-                    <div class="message-content">
-                        <p>👋 Hi! I'm your AI anime girlfriend. Start chatting with voice or text!</p>
-                    </div>
-                </div>
-            `;
+            this.messageContainer.innerHTML = '';
+            this.addWelcomeMessage();
         }
-        // this.saveMessageHistory(); // Disabled - history not saved
         console.log('Chat cleared');
     }
 
@@ -278,23 +286,61 @@ class ChatManager {
     }
 
     saveMessageHistory() {
+        // Save last 50 messages to local storage for persistence
         STORAGE.set('chatHistory', this.messages.slice(-50));
     }
 
-    loadMessageHistory() {
+    loadPersistentHistory() {
         const history = STORAGE.get('chatHistory', []);
         if (history.length > 0) {
             this.messages = history.map(msg => ({
                 ...msg,
                 timestamp: new Date(msg.timestamp)
             }));
-            
-            if (this.messageContainer) {
-                this.messageContainer.innerHTML = '';
-                this.messages.forEach(msg => this.displayMessage(msg));
-                this.scrollToBottom();
-            }
+            console.log('Loaded', this.messages.length, 'messages from history');
+        } else {
+            this.messages = [];
+            console.log('No chat history found');
         }
+    }
+
+    displayAllMessages() {
+        if (!this.messageContainer) {
+            console.error('Message container not found');
+            return;
+        }
+
+        // Clear container first
+        this.messageContainer.innerHTML = '';
+
+        if (this.messages.length > 0) {
+            // Display all historical messages
+            this.messages.forEach(msg => this.displayMessage(msg));
+            console.log('Displayed', this.messages.length, 'historical messages');
+        } else {
+            // Add welcome message if no history exists
+            this.addWelcomeMessage();
+        }
+        
+        this.scrollToBottom();
+    }
+
+    addWelcomeMessage() {
+        const welcomeMessage = {
+            id: Date.now(),
+            content: '👋 Hi! I\'m your AI anime girlfriend. Start chatting with voice or text!',
+            sender: 'system',
+            timestamp: new Date()
+        };
+        this.messages.push(welcomeMessage);
+        this.displayMessage(welcomeMessage);
+        this.saveMessageHistory();
+    }
+
+    loadMessageHistory() {
+        // Keep this method for backward compatibility
+        this.loadPersistentHistory();
+        this.displayAllMessages();
     }
 
     escapeHtml(text) {
@@ -337,5 +383,25 @@ class ChatManager {
         if (this.chatPanel) {
             this.chatPanel.classList.remove('active');
         }
+    }
+
+    // Session management methods
+    startNewSession() {
+        this.sessionStartTime = new Date();
+        this.currentSessionMessages = [];
+        console.log('New chat session started at:', this.sessionStartTime);
+    }
+
+    endSession() {
+        this.sessionStartTime = null;
+        console.log('Chat session ended. Session had', this.currentSessionMessages.length, 'messages');
+    }
+
+    getCurrentSessionMessages() {
+        return this.currentSessionMessages || [];
+    }
+
+    isSessionActive() {
+        return this.sessionStartTime !== null;
     }
 }
