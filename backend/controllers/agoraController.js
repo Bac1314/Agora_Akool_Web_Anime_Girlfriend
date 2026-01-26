@@ -50,7 +50,7 @@ const getChannelInfo = (req, res) => {
 
 const startConversation = async (req, res) => {
   try {
-    const { channel, agentName, remoteUid, userName, systemPrompt, previousConversations } = req.body;
+    const { channel, agentName, remoteUid, userName, systemPrompt, previousConversations, voiceId } = req.body;
     
     if (!channel || !agentName || !remoteUid) {
       return res.status(400).json({ 
@@ -149,7 +149,7 @@ const startConversation = async (req, res) => {
             group_id: process.env.TTS_MINIMAX_GROUP_ID,
             model: "speech-2.6-turbo",
             voice_setting: {
-              voice_id: process.env.TTS_MINIMAX_VOICE_ID
+              voice_id: voiceId || process.env.TTS_MINIMAX_VOICE_ID
             },
             audio_setting: {
               sample_rate: 16000,
@@ -177,7 +177,7 @@ const startConversation = async (req, res) => {
             redundant: false
           },
           silence_config: { 
-            timeout_ms: 10000, // 10 seconds of silence detection
+            timeout_ms: 30000, // 30 seconds of silence detection
             action: "think", // Agent will think/respond after silence
             content: "User hasn't spoken for a while. Engage the user with a question or prompt."
           }

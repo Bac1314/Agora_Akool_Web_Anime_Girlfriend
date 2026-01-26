@@ -784,7 +784,7 @@ html, body {
 }
 
 /* Language Select Dropdown */
-.language-select {
+.language-select, .voice-select {
     width: 100%;
     padding: 12px 15px;
     border: 1px solid #ddd;
@@ -794,7 +794,23 @@ html, body {
     transition: border-color 0.3s ease;
 }
 
-.language-select:focus {
+.language-select:focus, .voice-select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* Custom Voice Input */
+.custom-voice-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: white;
+    transition: border-color 0.3s ease;
+}
+
+.custom-voice-input:focus {
     outline: none;
     border-color: #3498db;
 }

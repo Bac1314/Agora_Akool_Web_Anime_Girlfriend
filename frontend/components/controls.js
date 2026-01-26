@@ -303,7 +303,8 @@ class ControlsManager {
             channel: UTILS.generateChannelName(),
             userName: STORAGE.get('userName', CONFIG.DEFAULT_USER_NAME),
             enableVoice: STORAGE.get('enableVoice', true),
-            enableAvatar: STORAGE.get('enableAvatar', true)
+            enableAvatar: STORAGE.get('enableAvatar', true),
+            voiceId: STORAGE.get('voiceId', 'BritishChild_female_1_v1')
         };
     }
 
@@ -508,6 +509,8 @@ class SettingsModal {
         this.enableAvatarCheckbox = document.getElementById('enableAvatar');
         this.systemPromptTextarea = document.getElementById('systemPrompt');
         this.resetPromptBtn = document.getElementById('resetPromptBtn');
+        this.voiceSelect = document.getElementById('voiceSelect');
+        this.customVoiceId = document.getElementById('customVoiceId');
     }
 
     async loadCurrentSettings() {
@@ -529,6 +532,31 @@ class SettingsModal {
 
         if (this.enableAvatarCheckbox) {
             this.enableAvatarCheckbox.checked = STORAGE.get('enableAvatar', true);
+        }
+
+        // Load voice settings
+        if (this.voiceSelect && this.customVoiceId) {
+            const savedVoiceId = STORAGE.get('voiceId', 'BritishChild_female_1_v1');
+            const voiceOptions = ['English_PlayfulGirl', 'BritishChild_female_1_v1', 'English_CharmingQueen', 'English_FriendlyNeighbor'];
+            
+            if (voiceOptions.includes(savedVoiceId)) {
+                this.voiceSelect.value = savedVoiceId;
+                this.customVoiceId.style.display = 'none';
+            } else {
+                this.voiceSelect.value = 'custom';
+                this.customVoiceId.value = savedVoiceId;
+                this.customVoiceId.style.display = 'block';
+            }
+            
+            // Handle voice selection changes
+            this.voiceSelect.addEventListener('change', () => {
+                if (this.voiceSelect.value === 'custom') {
+                    this.customVoiceId.style.display = 'block';
+                    this.customVoiceId.focus();
+                } else {
+                    this.customVoiceId.style.display = 'none';
+                }
+            });
         }
 
         // Load system prompt from localStorage or fetch default from backend
@@ -596,6 +624,22 @@ class SettingsModal {
 
             // Remove any old channelName from storage to ensure fresh generation
             STORAGE.remove('channelName');
+
+            // Save voice selection
+            if (this.voiceSelect && this.customVoiceId) {
+                let voiceId;
+                if (this.voiceSelect.value === 'custom') {
+                    voiceId = this.customVoiceId.value.trim();
+                    if (!voiceId) {
+                        UTILS.showToast('Please enter a custom voice ID or select a preset voice', 'error');
+                        return;
+                    }
+                } else {
+                    voiceId = this.voiceSelect.value;
+                }
+                STORAGE.set('voiceId', voiceId);
+                console.log('Voice ID saved:', voiceId);
+            }
 
             // Save system prompt to localStorage (per-user, persistent)
             if (this.systemPromptTextarea) {

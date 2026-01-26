@@ -183,7 +183,8 @@ class AgoraManager {
                 remoteUid: userUID,
                 userName: userName, // Add userName for personalized greeting
                 systemPrompt: systemPrompt, // Send user's custom prompt if available
-                previousConversations: previousConversations // Send chat history for context
+                previousConversations: previousConversations, // Send chat history for context
+                voiceId: settings.voiceId // Send selected voice ID
             });
 
             this.agentId = conversationData.agentId;

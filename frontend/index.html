@@ -165,6 +165,20 @@
                         </select>
                     </div>
                     <div class="setting-group">
+                        <label for="voiceSelect">TTS Voice:</label>
+                        <select id="voiceSelect" class="voice-select">
+                            <option value="English_PlayfulGirl">English Playful Girl</option>
+                            <option value="BritishChild_female_1_v1">British Child Female</option>
+                            <option value="English_CharmingQueen">English Charming Queen</option>
+                            <option value="English_FriendlyNeighbor">English Friendly Neighbor</option>
+                            <option value="custom">Custom Voice ID</option>
+                        </select>
+                        <input type="text" id="customVoiceId" placeholder="Enter custom voice ID..." style="display: none; margin-top: 8px;" class="custom-voice-input">
+                        <div class="setting-hint">
+                            <small>Select the TTS voice for the AI. Changes will apply to new conversations.</small>
+                        </div>
+                    </div>
+                    <div class="setting-group">
                         <label for="systemPrompt">AI System Prompt:</label>
                         <textarea id="systemPrompt" rows="6" placeholder="Enter the AI's system prompt..."></textarea>
                         <div class="setting-hint">
