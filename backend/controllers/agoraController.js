@@ -7,7 +7,7 @@ function getPersonalizedGreeting(userName, hasHistory) {
   const name = userName && userName !== 'User' ? userName : '';
   
   if (!name) {
-    return "Hi there! I'm your AI companion. How can I make your day better?";
+    return "Hi there! I'm your digital companion. How can I make your day better?";
   }
   
   if (hasHistory) {
@@ -20,9 +20,9 @@ function getPersonalizedGreeting(userName, hasHistory) {
     return greetings[Math.floor(Math.random() * greetings.length)];
   } else {
     const greetings = [
-      `Hi ${name}! I'm your AI companion. How can I make your day better?`,
+      `Hi ${name}! I'm your digital companion. How can I make your day better?`,
       `Hello ${name}! It's wonderful to meet you! I'm here to chat and help brighten your day!`,
-      `Hey there, ${name}! I'm your AI girlfriend and I'm excited to get to know you!`,
+      `Hey there, ${name}! I'm your digital girlfriend and I'm excited to get to know you!`,
       `Hi ${name}! Welcome! I'm here to be your companion. What would you like to talk about?`
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
@@ -50,7 +50,7 @@ const getChannelInfo = (req, res) => {
 
 const startConversation = async (req, res) => {
   try {
-    const { channel, agentName, remoteUid, userName, systemPrompt, previousConversations, voiceId } = req.body;
+    const { channel, agentName, remoteUid, userName, systemPrompt, previousConversations, voiceId, coachPrompt } = req.body;
     
     if (!channel || !agentName || !remoteUid) {
       return res.status(400).json({ 
@@ -82,7 +82,11 @@ const startConversation = async (req, res) => {
     // Use provided system prompt or fall back to env variable or default
     const defaultSystemPrompt = "You are a friendly AI anime girlfriend. Respond naturally in a caring, playful manner. Keep responses brief and conversational since this is voice-to-voice communication. Avoid long paragraphs and speak as if having a real conversation. Only output plain text responses, without any markdown, HTML tags, or emojis.";
     let effectiveSystemPrompt = systemPrompt || process.env.LLM_SYSTEM_PROMPT || defaultSystemPrompt;
-    
+
+    // Append service description and constraints
+    effectiveSystemPrompt += 'Output constraints:Only output plain text. Do not use markdown, emojis, asterisks, formatting symbols, or stage directions. Keep responses concise and conversational.';
+    // Append output constraints and error handling instructions
+    effectiveSystemPrompt += "Service: This is a voice-to-voice service that relies on ASR and TTS as well. If speech input seems incorrect or confusing, gently ask for clarification without assuming intent. Keep responses short and conversational, suitable for spoken interaction. ";
     // Add previous conversation context to system prompt if available
     if (hasHistory) {
       const historyContext = previousConversations

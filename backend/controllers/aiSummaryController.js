@@ -5,7 +5,7 @@ const axios = require('axios');
 
 const sumAndRateConversation = async (req, res) => {
     try {
-        const { transcript } = req.body;
+        const { transcript, coachRatingPrompt } = req.body;
 
         if (!transcript || !Array.isArray(transcript) || transcript.length === 0) {
             return res.status(400).json({
@@ -31,7 +31,7 @@ const sumAndRateConversation = async (req, res) => {
             });
         }
 
-        const prompt = `${process.env.LLM_AI_SUMMARY_RATING_PROMPT}
+        const prompt = `${coachRatingPrompt || process.env.LLM_AI_SUMMARY_RATING_PROMPT}
 
         The conversaion follows the pattern User: message. AI girlfriend: message. 
         

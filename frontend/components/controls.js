@@ -360,13 +360,19 @@ class SummaryModal {
         }
 
         try {
+            // Get custom coach rating prompt from localStorage
+            const coachRatingPrompt = STORAGE.get('coachRatingPrompt', null);
+            
             // Call backend API to get summary and rating
             const response = await fetch('/api/ai-summary/summarize-and-rate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ transcript })
+                body: JSON.stringify({ 
+                    transcript,
+                    coachRatingPrompt 
+                })
             });
 
             if (!response.ok) {
@@ -511,6 +517,8 @@ class SettingsModal {
         this.resetPromptBtn = document.getElementById('resetPromptBtn');
         this.voiceSelect = document.getElementById('voiceSelect');
         this.customVoiceId = document.getElementById('customVoiceId');
+        this.coachRatingPromptTextarea = document.getElementById('coachRatingPrompt');
+        this.resetCoachRatingPromptBtn = document.getElementById('resetCoachRatingPromptBtn');
     }
 
     async loadCurrentSettings() {
@@ -586,6 +594,23 @@ class SettingsModal {
                 }
             }
         }
+
+        // Load coach rating prompt from localStorage or fetch default from env
+        if (this.coachRatingPromptTextarea) {
+            const savedCoachPrompt = STORAGE.get('coachRatingPrompt', null);
+
+            if (savedCoachPrompt) {
+                // Use saved prompt from localStorage
+                this.coachRatingPromptTextarea.value = savedCoachPrompt;
+            } else {
+                // Use default from environment variable
+                const defaultCoachPrompt = `You are a girlfriend coach who specializes in helping men attract and build chemistry with Japanese women. Your tone should be casual, confident, playful, and slightly naughty, but never rude, aggressive, or disrespectful. Analyze the conversation and provide a rating from 1-5 based on attractiveness and chemistry-building skills.`;
+                this.coachRatingPromptTextarea.value = defaultCoachPrompt;
+                this.coachRatingPromptTextarea.placeholder = 'Using default coach rating prompt...';
+                // Save default to localStorage for future use
+                STORAGE.set('coachRatingPrompt', defaultCoachPrompt);
+            }
+        }
     }
 
     attachEventListeners() {
@@ -599,6 +624,10 @@ class SettingsModal {
 
         if (this.resetPromptBtn) {
             this.resetPromptBtn.addEventListener('click', () => this.resetSystemPrompt());
+        }
+
+        if (this.resetCoachRatingPromptBtn) {
+            this.resetCoachRatingPromptBtn.addEventListener('click', () => this.resetCoachRatingPrompt());
         }
 
         if (this.modal) {
@@ -650,6 +679,15 @@ class SettingsModal {
                 }
             }
 
+            // Save coach rating prompt to localStorage (per-user, persistent)
+            if (this.coachRatingPromptTextarea) {
+                const coachRatingPrompt = this.coachRatingPromptTextarea.value.trim();
+                if (coachRatingPrompt) {
+                    STORAGE.set('coachRatingPrompt', coachRatingPrompt);
+                    console.log('Coach rating prompt saved to localStorage');
+                }
+            }
+
             UTILS.showToast('Settings saved successfully!', 'success');
             this.hide();
 
@@ -683,6 +721,24 @@ class SettingsModal {
         } catch (error) {
             console.error('Failed to reset system prompt:', error);
             UTILS.showToast('Failed to reset system prompt', 'error');
+        }
+    }
+
+    async resetCoachRatingPrompt() {
+        try {
+            const defaultCoachPrompt = `You are a girlfriend coach who specializes in helping men attract and build chemistry with Japanese women. Your tone should be casual, confident, playful, and slightly naughty, but never rude, aggressive, or disrespectful. Analyze the conversation and provide a rating from 1-5 based on attractiveness and chemistry-building skills.`;
+
+            if (this.coachRatingPromptTextarea) {
+                this.coachRatingPromptTextarea.value = defaultCoachPrompt;
+            }
+
+            // Update localStorage with default
+            STORAGE.set('coachRatingPrompt', defaultCoachPrompt);
+
+            UTILS.showToast('Coach rating prompt reset to default', 'success');
+        } catch (error) {
+            console.error('Failed to reset coach rating prompt:', error);
+            UTILS.showToast('Failed to reset coach rating prompt', 'error');
         }
     }
 
