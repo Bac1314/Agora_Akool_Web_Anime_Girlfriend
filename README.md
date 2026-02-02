@@ -12,12 +12,8 @@ A modern web-based AI anime girlfriend application featuring full-screen immersi
 - **🗣️ Cascaded Voice-to-Voice**: Advanced Agora ConvoAI with custom ASR, LLM, and TTS providers
 - **🎭 Avatar Rendering**: Realistic Akool avatar with lip-sync and expressions
 - **⭐ Conversation Summary & Rating**: AI analyzes each conversation and provides a 1-5 star rating with detailed summary
-- **📱 Mobile-First Design**: Optimized for mobile devices with touch-friendly controls
 - **⚙️ Customizable AI Models**: Configure your own LLM, ASR, and TTS services
-- **🔒 Secure Architecture**: API keys safely stored on backend
 - **🔐 HTTP Basic Authentication**: Optional password protection for production deployments
-- **🎨 Modern UI/UX**: Glass-morphism effects, backdrop blur, and smooth animations
-- **💫 Streaming Responses**: AI responses stream word-by-word for natural conversation flow
 
 ## 🎯 Prerequisites
 
@@ -30,11 +26,11 @@ Before setting up this project, ensure you have:
   - API Key and Secret (for ConvoAI REST API)
 - **Akool Account** - Contact Agora sales for API access
   - Akool API Key
-  - Avatar ID from Akool dashboard
+  - Avatar ID (ask Agora for ids)
 - **AI Service Providers** (Choose your preferred vendors)
-  - **ASR**: Agora Ares (default), Azure Speech, OpenAI Whisper
-  - **LLM**: OpenAI GPT-4o-mini (default), Azure OpenAI, Anthropic Claude
-  - **TTS**: Microsoft Azure TTS (default), OpenAI TTS, ElevenLabs
+  - **ASR**: Agora Ares (default), Azure Speech, etc.
+  - **LLM**: OpenAI GPT-4o-mini (default), Azure OpenAI, Anthropic Claude, etc.
+  - **TTS**: Minimax (default), OpenAI TTS, ElevenLabs, Microsoft Azure TTS, etc.
 
 ### Development Tools
 - Git
@@ -51,7 +47,7 @@ cd agora-akool-anime-girlfriend
 
 ### 2. Install Dependencies
 ```bash
-npm install
+npm install --force
 ```
 
 ### 3. Environment Setup
@@ -66,24 +62,7 @@ Edit `.env` with your credentials:
 AGORA_APP_ID=your_agora_app_id_here
 AGORA_API_KEY=your_agora_api_key_here
 AGORA_API_SECRET=your_agora_api_secret_here
-
-# Akool Configuration
-AKOOL_API_KEY=your_akool_api_key_here
-AKOOL_AVATAR_ID=your_avatar_id_here
-
-# LLM Configuration (OpenAI Example)
-LLM_URL=https://api.openai.com/v1/chat/completions
-LLM_API_KEY=your_openai_api_key_here
-LLM_MODEL=gpt-4o-mini
-LLM_SYSTEM_PROMPT=You are a friendly AI anime girlfriend...
-
-# TTS Configuration (Microsoft Azure Example)
-TTS_Microsoft_API_KEY=your_azure_tts_key_here
-TTS_Microsoft_REGION=eastus
-TTS_Microsoft_VOICE=en-US-AriaNeural
-
-# Server Configuration
-PORT=3000
+etc
 ```
 
 ### 4. Start the Application
@@ -167,10 +146,8 @@ Manages user controls:
 │   │   └── i18n.js          # Internationalization
 │   ├── index.html        # Main HTML file
 │   └── main.js           # Application entry point
-├── CLAUDE_sessions/      # Development session logs
 ├── .env.example          # Environment template
 ├── package.json          # Dependencies and scripts
-├── CLAUDE.md            # Project documentation
 └── README.md            # This file
 ```
 
@@ -185,9 +162,6 @@ Configure your Agora settings in the [Agora Console](https://console.agora.io/):
 
 ### Akool Avatar Setup
 1. Contact Agora sales to purchase Akool API access
-2. Access the Akool dashboard through Agora's portal
-3. Select or create an avatar
-4. Note the Avatar ID for your `.env` file
 
 ### AI Model Configuration
 
@@ -206,7 +180,8 @@ The application uses a cascaded architecture where you can configure each compon
 Configure via environment variables (see `.env.example`)
 
 #### TTS (Text-to-Speech)
-- **Microsoft Azure TTS** (default): High-quality voices
+- **Minimax** (default): multiple voice styles and low-latency streaming output
+- **Microsoft Azure TTS**: High-quality voices
 - **ElevenLabs**: Premium voice quality
 - **Others**: Check Agora Documentation
 

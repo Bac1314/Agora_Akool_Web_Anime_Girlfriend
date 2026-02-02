@@ -7,7 +7,7 @@ const CONFIG = {
     AUTH_PASSWORD: window.APP_AUTH_PASSWORD || '',
     AGORA_SETTINGS: {
         codec: 'vp8',
-        mode: 'rtc',
+        mode: 'live',
         role: 'host'
     },
     AVATAR_SETTINGS: {
