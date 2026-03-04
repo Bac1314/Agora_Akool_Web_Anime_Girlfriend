@@ -155,6 +155,11 @@ class AgoraManager {
 
             // Display user's camera preview
             this.displayUserCamera(this.localVideoTrack);
+            
+            // Initialize device manager with tracks
+            if (window.deviceManager) {
+                await window.deviceManager.initialize(this.rtcClient, this.localAudioTrack, this.localVideoTrack);
+            }
 
             // Update connection state
             this.isConnected = true;
@@ -241,6 +246,11 @@ class AgoraManager {
                 } catch (rtmError) {
                     console.error('Error cleaning up RTM:', rtmError);
                 }
+            }
+
+            // Clean up device manager
+            if (window.deviceManager) {
+                window.deviceManager.destroy();
             }
 
             // Stop and close local tracks

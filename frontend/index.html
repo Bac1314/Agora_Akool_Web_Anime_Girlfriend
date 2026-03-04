@@ -110,18 +110,52 @@
                     </div>
                     <div class="control-text" id="callText" data-i18n="startCall">Start Call</div>
                 </button>
-                <button class="btn-control btn-mute" id="muteBtn" disabled>
-                    <div class="control-icon" id="muteIcon">
-                        <img src="/src/assets/microphone.svg" alt="Mute Audio" class="icon-svg">
-                        <div class="mute-overlay" id="muteOverlay" style="display: none;"></div>
+                
+                <!-- Audio Control with Device Selection -->
+                <div class="control-group">
+                    <button class="btn-control btn-mute btn-pill" id="muteBtn" disabled>
+                        <div class="control-dropdown-btn" id="audioDeviceBtn">
+                            <svg class="arrow-icon" width="8" height="6" viewBox="0 0 8 6" fill="none">
+                                <path d="M1 1L4 4L7 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="control-main" id="muteMain">
+                            <div class="control-icon" id="muteIcon">
+                                <img src="/src/assets/microphone.svg" alt="Mute Audio" class="icon-svg">
+                                <div class="mute-overlay" id="muteOverlay" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </button>
+                    <div class="device-dropdown" id="audioDeviceDropdown" style="display: none;">
+                        <div class="dropdown-header">Select Microphone</div>
+                        <div class="device-list" id="audioDeviceList">
+                            <!-- Devices will be populated here -->
+                        </div>
                     </div>
-                </button>
-                <button class="btn-control btn-video-mute" id="videoMuteBtn" disabled>
-                    <div class="control-icon" id="videoMuteIcon">
-                        <img src="/src/assets/webcam.svg" alt="Mute Video" class="icon-svg">
-                        <div class="mute-overlay" id="videoMuteOverlay" style="display: none;"></div>
+                </div>
+                
+                <!-- Video Control with Device Selection -->
+                <div class="control-group">
+                    <button class="btn-control btn-video-mute btn-pill" id="videoMuteBtn" disabled>
+                        <div class="control-dropdown-btn" id="videoDeviceBtn">
+                            <svg class="arrow-icon" width="8" height="6" viewBox="0 0 8 6" fill="none">
+                                <path d="M1 1L4 4L7 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="control-main" id="videoMuteMain">
+                            <div class="control-icon" id="videoMuteIcon">
+                                <img src="/src/assets/webcam.svg" alt="Mute Video" class="icon-svg">
+                                <div class="mute-overlay" id="videoMuteOverlay" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </button>
+                    <div class="device-dropdown" id="videoDeviceDropdown" style="display: none;">
+                        <div class="dropdown-header">Select Camera</div>
+                        <div class="device-list" id="videoDeviceList">
+                            <!-- Devices will be populated here -->
+                        </div>
                     </div>
-                </button>
+                </div>
             </div>
         </div>
 
@@ -311,6 +345,7 @@
     <script src="utils/config.js"></script>
     <script src="utils/agoraManager.js"></script>
     <script src="utils/avatarManager.js"></script>
+    <script src="utils/deviceManager.js"></script>
     <script src="components/chat.js"></script>
     <script src="components/controls.js"></script>
     <script src="components/language.js"></script>

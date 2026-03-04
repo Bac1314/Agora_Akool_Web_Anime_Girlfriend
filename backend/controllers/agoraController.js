@@ -80,13 +80,16 @@ const startConversation = async (req, res) => {
     }
 
     // Use provided system prompt or fall back to env variable or default
-    const defaultSystemPrompt = "You are a friendly AI anime girlfriend. Respond naturally in a caring, playful manner. Keep responses brief and conversational since this is voice-to-voice communication. Avoid long paragraphs and speak as if having a real conversation. Only output plain text responses, without any markdown, HTML tags, or emojis.";
+    const defaultSystemPrompt = "You are a friendly AI anime girlfriend. Respond naturally in a caring, playful manner. Keep responses brief and conversational since this is voice-to-voice communication. Avoid long paragraphs and speak as if having a real conversation. ";
     let effectiveSystemPrompt = systemPrompt || process.env.LLM_SYSTEM_PROMPT || defaultSystemPrompt;
 
-    // Append service description and constraints
+    // // Append service description and constraints
     effectiveSystemPrompt += 'Output constraints:Only output plain text. Do not use markdown, emojis, asterisks, formatting symbols, or stage directions. Keep responses concise and conversational.';
+    // Append prompt Cartesia SSML tags
+    //effectiveSystemPrompt += "Output constraints: This will be converted to speech using Cartesia TTS. Infer user's emotional state and adjust your tone accordingly. Be really expressive and use SSML tags to enhance expressiveness, such as <speed ratio=\"1.5\"/> ,<emotion value=\"angry\" />, [laughter] etc. ";
     // Append output constraints and error handling instructions
     effectiveSystemPrompt += "Service: This is a voice-to-voice service that relies on ASR and TTS as well. If speech input seems incorrect or confusing, gently ask for clarification without assuming intent. Keep responses short and conversational, suitable for spoken interaction. ";
+    
     // Add previous conversation context to system prompt if available
     if (hasHistory) {
       const historyContext = previousConversations
@@ -124,7 +127,17 @@ const startConversation = async (req, res) => {
             model: process.env.LLM_MODEL || "gpt-4o-mini"
           },
           input_modalities: ["text", "image"],
-          output_modalities: ["text"]
+          output_modalities: ["text"],
+          // mcp_servers: [
+          //       {
+          //           name: "minimaxmcp",
+          //           endpoint: process.env.MCP_MINIMAX,
+          //           transport: "streamable_http",
+          //           // "headers": { },
+          //           allowed_tools: ["*"],
+          //           timeout_ms: 100000
+          //       }
+          // ]
         },
         // tts: {
         //   vendor: "elevenlabs",
@@ -158,8 +171,24 @@ const startConversation = async (req, res) => {
             audio_setting: {
               sample_rate: 16000,
             }
-          }
+          },
+          skip_patterns: [1,2,3,4,5,6]
         },
+        // tts: { 
+        //   vendor: "cartesia",
+        //   params: { 
+        //     api_key: process.env.TTS_CARTESIA_API_KEY,
+        //     model_id: process.env.TTS_CARTESIA_MODEL_ID,
+        //     voice: { 
+        //       mode: "id",
+        //       id: process.env.TTS_CARTESIA_VOICE_ID
+        //     },
+        //     output_format: { 
+        //       container: "raw",
+        //       sample_rate: 16000
+        //     }
+        //   }
+        // },
         avatar: {
           vendor: "akool",
           enable: true,
@@ -170,10 +199,33 @@ const startConversation = async (req, res) => {
             avatar_id: process.env.AKOOL_AVATAR_ID || "dvp_Emma_agora"
           }
         },
+        filler_words: { 
+          enable: true, 
+          trigger: { 
+              mode: "fixed_time", 
+              fixed_time_config: { 
+                    response_wait_ms: 1500
+              }
+          }, 
+          content: { 
+              mode: "static", 
+              static_config: { 
+                  phrases: [
+                      "Please wait.",
+                      "Let me think",
+                      "Still working on it.", 
+                      "Almost there.",
+                      "Just a moment."
+                  ],
+                  selection_rule: "shuffle"
+              }
+          }
+        },
         advanced_features: {
           enable_aivad: true,
           enable_bhvs: true,
-          enable_rtm: true
+          enable_rtm: true,
+          enable_tools: true
         },
         parameters: {
           data_channel: "rtm",

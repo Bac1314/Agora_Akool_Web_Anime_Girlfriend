@@ -199,7 +199,7 @@ class ChatManager {
             const lastElement = messageElements[messageElements.length - 1];
             const contentP = lastElement.querySelector('.message-content p');
             if (contentP) {
-                contentP.textContent = message.content;
+                contentP.innerHTML = this.processMessageContent(message.content);
             }
         }
         this.saveMessageHistory();
@@ -211,14 +211,56 @@ class ChatManager {
 
         const messageElement = document.createElement('div');
         messageElement.className = `message ${message.sender}`;
+        
+        const contentHTML = this.processMessageContent(message.content);
         messageElement.innerHTML = `
             <div class="message-content">
-                <p>${this.escapeHtml(message.content)}</p>
+                <p>${contentHTML}</p>
                 <span class="timestamp">${UTILS.formatTime(message.timestamp)}</span>
             </div>
         `;
 
         this.messageContainer.appendChild(messageElement);
+    }
+
+    /**
+     * Process message content to detect and convert URLs to clickable download links
+     * @param {string} content - Raw message content
+     * @returns {string} HTML content with URLs converted to links
+     */
+    processMessageContent(content) {
+        // URL regex pattern - matches http/https URLs but stops at closing punctuation
+        // Excludes: closing parenthesis ), closing brace }, closing bracket ], quotes ", angle brackets >
+        const urlRegex = /(https?:\/\/[^\s\)}>"\]]*)/g;
+        
+        // Escape HTML first
+        let escapedContent = this.escapeHtml(content);
+        
+        // Replace URLs with clickable download links
+        escapedContent = escapedContent.replace(urlRegex, (url) => {
+            const displayUrl = this.shortenUrl(url);
+            return `<a href="${url}" download target="_blank" class="download-link" title="Click to download">📥 ${displayUrl}</a>`;
+        });
+        
+        return escapedContent;
+    }
+
+    /**
+     * Shorten URL for display purposes
+     * @param {string} url - Full URL
+     * @returns {string} Shortened URL
+     */
+    shortenUrl(url) {
+        try {
+            const urlObj = new URL(url);
+            // Get the filename from path or just show domain
+            const pathname = urlObj.pathname;
+            const filename = pathname.substring(pathname.lastIndexOf('/') + 1) || urlObj.hostname;
+            return filename.length > 40 ? filename.substring(0, 40) + '...' : filename;
+        } catch (e) {
+            // If URL parsing fails, just shorten the string
+            return url.length > 40 ? url.substring(0, 40) + '...' : url;
+        }
     }
 
     showTypingIndicator() {
