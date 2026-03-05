@@ -213,6 +213,19 @@
                         </div>
                     </div>
                     <div class="setting-group">
+                        <label for="avatarSelect">Avatar:</label>
+                        <select id="avatarSelect" class="voice-select">
+                            <option value="dvp_Emma_agora">Emma (Default)</option>
+                            <option value="dvp_Alinna_emotionsit_agora">Alinna</option>
+                            <option value="data_jk_v1">Aira-chan</option>
+                            <option value="custom">Custom Avatar ID</option>
+                        </select>
+                        <input type="text" id="customAvatarId" placeholder="Enter custom avatar ID..." style="display: none; margin-top: 8px;" class="custom-voice-input">
+                        <div class="setting-hint">
+                            <small>Select the Akool avatar. Changes will apply to new conversations.</small>
+                        </div>
+                    </div>
+                    <div class="setting-group">
                         <label for="systemPrompt">AI System Prompt:</label>
                         <textarea id="systemPrompt" rows="6" placeholder="Enter the AI's system prompt..."></textarea>
                         <div class="setting-hint">

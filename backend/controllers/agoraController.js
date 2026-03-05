@@ -50,7 +50,7 @@ const getChannelInfo = (req, res) => {
 
 const startConversation = async (req, res) => {
   try {
-    const { channel, agentName, remoteUid, userName, systemPrompt, previousConversations, voiceId, coachPrompt } = req.body;
+    const { channel, agentName, remoteUid, userName, systemPrompt, previousConversations, voiceId, avatarId, coachPrompt } = req.body;
     
     if (!channel || !agentName || !remoteUid) {
       return res.status(400).json({ 
@@ -196,7 +196,7 @@ const startConversation = async (req, res) => {
             api_key: process.env.AKOOL_API_KEY,
             quality: "medium",
             agora_uid: avatarUid.toString(), 
-            avatar_id: process.env.AKOOL_AVATAR_ID || "dvp_Emma_agora"
+            avatar_id: avatarId || process.env.AKOOL_AVATAR_ID || "dvp_Emma_agora"
           }
         },
         filler_words: { 

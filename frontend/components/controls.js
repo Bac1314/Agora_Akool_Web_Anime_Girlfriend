@@ -304,7 +304,8 @@ class ControlsManager {
             userName: STORAGE.get('userName', CONFIG.DEFAULT_USER_NAME),
             enableVoice: STORAGE.get('enableVoice', true),
             enableAvatar: STORAGE.get('enableAvatar', true),
-            voiceId: STORAGE.get('voiceId', 'BritishChild_female_1_v1')
+            voiceId: STORAGE.get('voiceId', 'BritishChild_female_1_v1'),
+            avatarId: STORAGE.get('avatarId', 'dvp_Emma_agora')
         };
     }
 
@@ -517,6 +518,8 @@ class SettingsModal {
         this.resetPromptBtn = document.getElementById('resetPromptBtn');
         this.voiceSelect = document.getElementById('voiceSelect');
         this.customVoiceId = document.getElementById('customVoiceId');
+        this.avatarSelect = document.getElementById('avatarSelect');
+        this.customAvatarId = document.getElementById('customAvatarId');
         this.coachRatingPromptTextarea = document.getElementById('coachRatingPrompt');
         this.resetCoachRatingPromptBtn = document.getElementById('resetCoachRatingPromptBtn');
     }
@@ -563,6 +566,30 @@ class SettingsModal {
                     this.customVoiceId.focus();
                 } else {
                     this.customVoiceId.style.display = 'none';
+                }
+            });
+        }
+
+        // Load avatar settings
+        if (this.avatarSelect && this.customAvatarId) {
+            const savedAvatarId = STORAGE.get('avatarId', 'dvp_Emma_agora');
+            const avatarOptions = ['dvp_Emma_agora', 'dvp_Aria_agora', 'dvp_Lena_agora'];
+
+            if (avatarOptions.includes(savedAvatarId)) {
+                this.avatarSelect.value = savedAvatarId;
+                this.customAvatarId.style.display = 'none';
+            } else {
+                this.avatarSelect.value = 'custom';
+                this.customAvatarId.value = savedAvatarId;
+                this.customAvatarId.style.display = 'block';
+            }
+
+            this.avatarSelect.addEventListener('change', () => {
+                if (this.avatarSelect.value === 'custom') {
+                    this.customAvatarId.style.display = 'block';
+                    this.customAvatarId.focus();
+                } else {
+                    this.customAvatarId.style.display = 'none';
                 }
             });
         }
@@ -668,6 +695,22 @@ class SettingsModal {
                 }
                 STORAGE.set('voiceId', voiceId);
                 console.log('Voice ID saved:', voiceId);
+            }
+
+            // Save avatar selection
+            if (this.avatarSelect && this.customAvatarId) {
+                let avatarId;
+                if (this.avatarSelect.value === 'custom') {
+                    avatarId = this.customAvatarId.value.trim();
+                    if (!avatarId) {
+                        UTILS.showToast('Please enter a custom avatar ID or select a preset avatar', 'error');
+                        return;
+                    }
+                } else {
+                    avatarId = this.avatarSelect.value;
+                }
+                STORAGE.set('avatarId', avatarId);
+                console.log('Avatar ID saved:', avatarId);
             }
 
             // Save system prompt to localStorage (per-user, persistent)
